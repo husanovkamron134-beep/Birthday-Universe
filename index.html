@@ -59,12 +59,12 @@ import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/exampl
 
 // Personalize these four values before sharing the surprise.
 const CONFIG = {
-  recipient: '',
-  sender: 'Eng ezgu tilaklar bilan',
+  recipient: 'Maxliyo',
+  sender: 'Do‘stingdan samimiy tilaklar bilan',
   message: 'Yangi yoshing quvonchli lahzalar, katta orzular va unutilmas xotiralarga boy bo‘lsin.\nHar doim o‘z nuring bilan porla — bu koinotda sening o‘rning alohida.',
   revealTitle: 'Yulduzlardan senga xabar'
 };
-document.querySelector('#signature').textContent = CONFIG.sender;
+document.querySelector('#signature').textContent = CONFIG.sender;\ndocument.querySelector('.reveal-title').innerHTML = 'Maxliyo, tug‘ilgan kuning<br><em>muborak!</em>';\ndocument.querySelector('.reveal-kicker').textContent = '✦  SENGA ATALGAN KICHIK KOINOT  ✦';
 document.querySelector('#message').textContent = CONFIG.message;
 
 const host=document.querySelector('#stage');
