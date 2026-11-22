@@ -2,207 +2,908 @@
 <html lang="uz">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="theme-color" content="#050713">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#03040c">
 <title>Tug‘ilgan kun koinoti</title>
 <style>
-:root{--ink:#f5f4ff;--muted:#a8acc7;--gold:#f5d49a;--cyan:#8ee8ff;--bg:#050713}
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
-#stage{position:fixed;inset:0}canvas{display:block}
-.vignette{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 48%,transparent 28%,rgba(2,4,15,.24) 65%,rgba(2,3,10,.88) 100%);z-index:2}
-.grain{position:fixed;inset:-50%;z-index:3;pointer-events:none;opacity:.055;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");animation:grain .3s steps(2) infinite}
-@keyframes grain{0%{transform:translate(0,0)}25%{transform:translate(2%,-1%)}50%{transform:translate(-1%,2%)}75%{transform:translate(1%,1%)}100%{transform:translate(-2%,-1%)}}
-.ui{display:none}
-.top{display:flex;justify-content:space-between;align-items:center;gap:16px}.brand{font-size:10px;letter-spacing:.34em;text-transform:uppercase;color:#c5c8df}.status{font-size:10px;letter-spacing:.2em;color:#9fa7c7;display:flex;align-items:center;gap:9px}.dot{width:6px;height:6px;border-radius:50%;background:#9de8f5;box-shadow:0 0 14px #8ee8ff}
-.center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(780px,90vw);text-align:center;pointer-events:none;transition:opacity 1s,transform 1.2s}
-.eyebrow{font-size:10px;letter-spacing:.42em;text-transform:uppercase;color:var(--gold);margin-bottom:22px;text-shadow:0 0 20px #e6c68b55}
-h1{font-family:Georgia,"Times New Roman",serif;font-weight:400;font-size:clamp(42px,8.5vw,104px);line-height:.98;letter-spacing:-.045em;margin:0;text-shadow:0 8px 50px #000}
-h1 span{display:block;color:#f4d9a8;font-style:italic}
-.sub{font-size:clamp(12px,1.5vw,15px);line-height:1.8;letter-spacing:.08em;color:#c0c5dc;margin:24px auto 0;max-width:440px}
-.bottom{display:flex;justify-content:space-between;align-items:end;gap:20px}.hint{font-size:10px;line-height:1.8;letter-spacing:.18em;text-transform:uppercase;color:#a5abc7}.hint b{color:#f0d39e;font-weight:500}
-.actions{display:flex;gap:10px;pointer-events:auto}.btn{border:1px solid #ffffff35;background:#080d20a8;color:#f4f2ed;padding:13px 20px;border-radius:2px;letter-spacing:.16em;text-transform:uppercase;font-size:9px;cursor:pointer;backdrop-filter:blur(12px);transition:.3s}.btn:hover{border-color:#f2d5a0;background:#f2d5a015;transform:translateY(-2px)}.btn.primary{background:linear-gradient(110deg,#e6c58c,#fff0c8);border-color:transparent;color:#141321;font-weight:700}
-#intro.hidden{opacity:0;transform:translate(-50%,-46%);pointer-events:none}
-#photo-viewer{position:fixed;inset:0;z-index:30;display:none;place-items:center;align-content:center;gap:14px;padding:24px;background:rgba(3,5,18,.96);backdrop-filter:blur(18px);text-align:center}
-#photo-viewer.open{display:grid}
-#photo-large{display:block;max-width:min(88vw,1000px);max-height:78vh;width:auto;height:auto;object-fit:contain;border:1px solid rgba(245,212,154,.45);box-shadow:0 18px 80px #000b;border-radius:8px}
-#photo-viewer p{margin:0;color:#f5d49a;font-size:10px;letter-spacing:.3em}
-#photo-close{position:absolute;top:max(18px,env(safe-area-inset-top));right:max(18px,env(safe-area-inset-right));width:44px;height:44px;border:1px solid #ffffff55;border-radius:50%;background:#11182dcc;color:#fff;font-size:30px;line-height:1;cursor:pointer}
-#reveal{position:fixed;inset:0;z-index:8;display:grid;place-items:center;background:radial-gradient(ellipse at center,#15142c 0%,#050713 70%);opacity:0;visibility:hidden;transition:opacity 1.4s,visibility 1.4s;padding:28px;text-align:center}
-#reveal.show{opacity:1;visibility:visible}
-.reveal-card{max-width:700px;transform:translateY(22px);transition:transform 1.2s .25s}.show .reveal-card{transform:translateY(0)}
-.reveal-kicker{font-size:10px;letter-spacing:.42em;color:var(--gold);text-transform:uppercase;margin-bottom:24px}
-.reveal-title{font:400 clamp(42px,8vw,88px)/1.03 Georgia,serif;margin:0 0 24px}.reveal-title em{color:var(--gold)}
-.reveal-message{color:#c6c9dc;font-size:clamp(14px,2vw,17px);line-height:1.9;white-space:pre-line}
-.reveal-sign{margin-top:34px;color:#f0d39e;font:italic 22px Georgia,serif}
-.close{margin-top:38px}
-#loader{position:fixed;inset:0;z-index:20;display:grid;place-items:center;background:#050713;transition:opacity .8s,visibility .8s}
-#loader.done{opacity:0;visibility:hidden}.loader-inner{text-align:center}.loader-mark{width:44px;height:44px;border:1px solid #ffffff24;border-top-color:#f1d19a;border-radius:50%;margin:0 auto 20px;animation:spin 1.4s linear infinite}.loader-text{font-size:9px;letter-spacing:.35em;color:#bfc4df;text-transform:uppercase}@keyframes spin{to{transform:rotate(360deg)}}
-@media(max-width:600px){.ui{padding:22px}.brand{font-size:8px}.status{font-size:8px}.center{top:46%}.sub{max-width:300px}.bottom{align-items:end}.hint{max-width:130px;font-size:8px}.actions{flex-direction:column}.btn{padding:12px 14px;font-size:8px}.actions .btn:first-child{display:none}}
-@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+:root{--ink:#f5f4ff;--muted:#a8acc7;--gold:#f5d49a;--cyan:#8ee8ff;--bg:#03040c}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+#stage{position:fixed;inset:0;touch-action:none}
+canvas{display:block}
 
+/* ——— umumiy qatlamlar ——— */
+.vignette{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 48%,transparent 40%,rgba(2,3,10,.35) 75%,rgba(1,2,7,.85) 100%);z-index:2}
+.grain{position:fixed;inset:-50%;z-index:3;pointer-events:none;opacity:.045;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E")}
+@media(hover:hover) and (pointer:fine){.grain{animation:grain .35s steps(2) infinite}}
+@keyframes grain{0%{transform:translate(0,0)}25%{transform:translate(2%,-1%)}50%{transform:translate(-1%,2%)}75%{transform:translate(1%,1%)}100%{transform:translate(-2%,-1%)}}
+
+#brand{position:fixed;top:max(20px,env(safe-area-inset-top));left:0;right:0;z-index:5;text-align:center;pointer-events:none;transition:opacity .7s}
+#brand small{display:block;font-size:10px;letter-spacing:.44em;text-transform:uppercase;color:var(--gold);opacity:.9;text-shadow:0 0 20px #e6c68b66}
+#brand strong{display:block;margin-top:9px;font:400 clamp(22px,4.6vw,40px)/1.1 Georgia,"Times New Roman",serif;letter-spacing:-.02em;text-shadow:0 4px 30px #000}
+#hint{position:fixed;left:0;right:0;bottom:max(22px,env(safe-area-inset-bottom));z-index:5;text-align:center;pointer-events:none;font-size:10px;line-height:2;letter-spacing:.2em;text-transform:uppercase;color:#a5abc7;transition:opacity .7s;text-shadow:0 2px 14px #000}
+#hint span{display:block}#hint b{color:#f0d39e;font-weight:500}
+body.overlay #brand,body.overlay #hint,body.busy #hint{opacity:0}
+
+/* ——— suratni "sayyora ichidan" ochish ——— */
+#photo-viewer{position:fixed;inset:0;z-index:30;display:grid;place-items:center;padding:22px;visibility:hidden;pointer-events:none;
+ background:radial-gradient(ellipse at center,rgba(9,12,38,.62) 0%,rgba(2,3,12,.94) 85%);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+ clip-path:circle(0px at var(--cx,50%) var(--cy,50%));
+ transition:clip-path 1.05s cubic-bezier(.3,.7,.1,1),visibility 0s 1.05s}
+#photo-viewer.open{visibility:visible;pointer-events:auto;clip-path:circle(150% at var(--cx,50%) var(--cy,50%));transition:clip-path 1.25s cubic-bezier(.2,.75,.15,1),visibility 0s}
+.pv-rays{position:absolute;left:50%;top:50%;width:190vmax;height:190vmax;margin:-95vmax 0 0 -95vmax;pointer-events:none;opacity:0;transition:opacity 1.6s .3s;
+ background:conic-gradient(from 0deg,transparent 0 6%,rgba(245,212,154,.10) 8%,transparent 11% 20%,rgba(142,232,255,.08) 23%,transparent 27% 40%,rgba(245,212,154,.09) 43%,transparent 47% 62%,rgba(180,150,255,.08) 65%,transparent 69% 84%,rgba(245,212,154,.10) 87%,transparent 91%);
+ -webkit-mask-image:radial-gradient(circle,#000 0,transparent 55%);mask-image:radial-gradient(circle,#000 0,transparent 55%);animation:spin 46s linear infinite}
+.open .pv-rays{opacity:1}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pv-frame{position:relative;margin:0;display:grid;gap:14px;justify-items:center;
+ transform:translate(var(--dx,0px),var(--dy,0px)) scale(.04);opacity:0;filter:blur(14px);
+ transition:transform .9s cubic-bezier(.3,.7,.1,1),opacity .5s,filter .6s}
+.open .pv-frame{transform:none;opacity:1;filter:none;transition:transform 1.25s cubic-bezier(.2,.85,.15,1) .15s,opacity .8s .15s,filter 1s .15s}
+#photo-large{display:block;max-width:min(88vw,980px);max-height:76vh;width:auto;height:auto;object-fit:contain;border-radius:14px;
+ border:1px solid rgba(245,212,154,.55);background:#0a0e24;
+ box-shadow:0 0 0 7px rgba(245,212,154,.05),0 30px 120px #000c,0 0 110px rgba(142,232,255,.16),0 0 60px rgba(245,212,154,.14)}
+#photo-cap{font-size:10px;letter-spacing:.34em;text-transform:uppercase;color:var(--gold);text-shadow:0 0 18px #e6c68b66}
+#photo-close{position:absolute;top:max(18px,env(safe-area-inset-top));right:max(18px,env(safe-area-inset-right));width:46px;height:46px;border:1px solid #ffffff55;border-radius:50%;background:#11182dcc;color:#fff;font-size:30px;line-height:1;cursor:pointer;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+
+/* ——— yakuniy tabrik sahnasi ——— */
+#reveal{position:fixed;inset:0;z-index:25;display:grid;place-items:center;padding:28px;text-align:center;overflow:auto;
+ background:radial-gradient(ellipse at center,rgba(6,8,26,.55) 0%,rgba(3,4,14,.92) 82%);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);
+ opacity:0;visibility:hidden;transition:opacity 1.2s,visibility 0s 1.2s}
+#reveal.show{opacity:1;visibility:visible;transition:opacity 1.3s,visibility 0s}
+#sparks{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.reveal-card{position:relative;z-index:1;max-width:720px;margin:auto}
+.reveal-kicker{font-size:10px;letter-spacing:.42em;color:var(--gold);text-transform:uppercase;margin-bottom:26px;opacity:0}
+.show .reveal-kicker{animation:fade 1.4s ease .3s both}
+.reveal-title{font:400 clamp(40px,9vw,92px)/1.04 Georgia,"Times New Roman",serif;letter-spacing:-.035em;margin:0 0 28px}
+.reveal-title .ln{display:block}
+.reveal-title .w{display:inline-block;white-space:nowrap}
+.reveal-title .l{display:inline-block;opacity:0}
+.show .reveal-title .l{animation:rise 1.15s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(.8s + var(--i) * 48ms)}
+.reveal-title em{font-style:italic;color:var(--gold);text-shadow:0 0 44px rgba(245,212,154,.6)}
+.reveal-message{color:#d0d3e6;font-size:clamp(14px,2vw,17px);line-height:1.95;margin:0}
+.ml{display:block;opacity:0}
+.show .ml{animation:fade 1.5s ease both;animation-delay:calc(2.4s + var(--k) * .55s)}
+.reveal-sign{margin-top:34px;color:#f0d39e;font:italic 22px Georgia,serif;opacity:0}
+.show .reveal-sign{animation:fade 1.5s ease 3.8s both}
+.btn{border:1px solid #ffffff35;background:#080d20a8;color:#f4f2ed;padding:14px 22px;border-radius:2px;letter-spacing:.16em;text-transform:uppercase;font-size:10px;cursor:pointer;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);transition:.3s}
+.btn:hover{border-color:#f2d5a0;background:#f2d5a015;transform:translateY(-2px)}
+.close{margin-top:38px;opacity:0}
+.show .close{animation:fade 1.2s ease 4.4s both}
+@keyframes rise{from{opacity:0;transform:translateY(.55em) scale(.9);filter:blur(10px)}to{opacity:1;transform:none;filter:blur(0)}}
+@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ——— yuklanish ——— */
+#loader{position:fixed;inset:0;z-index:40;display:grid;place-items:center;background:#03040c;transition:opacity 1s,visibility 1s}
+#loader.done{opacity:0;visibility:hidden}
+.loader-inner{text-align:center}
+.loader-mark{width:46px;height:46px;border:1px solid #ffffff24;border-top-color:#f1d19a;border-radius:50%;margin:0 auto 20px;animation:spin 1.4s linear infinite}
+.loader-text{font-size:9px;letter-spacing:.35em;color:#bfc4df;text-transform:uppercase}
+@media(max-width:600px){#brand small{font-size:8px}#hint{font-size:8.5px}}
+@media(prefers-reduced-motion:reduce){.grain{animation:none}.pv-rays{animation:none}}
 </style>
 </head>
 <body>
 <div id="stage"></div>
 <script>
-window.setTimeout(()=>{
- const loader=document.getElementById('loader');
+// Agar Three.js yuklanmasa (internet yo‘q bo‘lsa), foydalanuvchiga xabar ko‘rsatamiz.
+window.setTimeout(function(){
+ var loader=document.getElementById('loader');
  if(loader && !loader.classList.contains('done')){
   loader.classList.add('done');
   document.getElementById('stage').innerHTML='<div style="height:100%;display:grid;place-items:center;padding:28px;text-align:center;color:#f5d49a;font:14px system-ui">Koinot yuklanmadi. Internet aloqasini tekshirib, sahifani yangilang.</div>';
  }
-},15000);
+},20000);
 </script>
 
-<div id="photo-viewer" role="dialog" aria-modal="true" aria-label="Suratni ko‘rish"><button id="photo-close" aria-label="Yopish">×</button><img id="photo-large" alt="Maxliyo surati"><p>MAXLIYONING XOTIRASI</p></div>
+<div id="brand"><small>✦ Birthday Universe ✦</small><strong id="brand-name"></strong></div>
+<div id="hint"><span>Sayyoralarni bosing — har birida bitta xotira</span><span><b>Markaziy sayyora</b> — maxsus tabrik</span></div>
 <div class="vignette"></div><div class="grain"></div>
 <div id="loader"><div class="loader-inner"><div class="loader-mark"></div><div class="loader-text">Koinot tayyorlanmoqda</div></div></div>
-<div class="ui" id="interface" aria-hidden="true"></div>
+
+<div id="photo-viewer" role="dialog" aria-modal="true" aria-label="Xotira surati">
+ <div class="pv-rays"></div>
+ <figure class="pv-frame">
+  <img id="photo-large" alt="Xotira surati" decoding="async">
+  <figcaption id="photo-cap"></figcaption>
+ </figure>
+ <button id="photo-close" aria-label="Yopish">×</button>
+</div>
 
 <div id="reveal" role="dialog" aria-modal="true" aria-label="Tug‘ilgan kun tabrigi">
+ <canvas id="sparks"></canvas>
  <div class="reveal-card">
-  <h2 class="reveal-title">Tug‘ilgan kuning<br><em>muborak!</em></h2>
-  <p class="reveal-message" id="message">Yangi yoshing quvonchli lahzalar, katta orzular va unutilmas xotiralarga boy bo‘lsin.
-Har doim o‘z nuring bilan porla — bu koinotda sening o‘rning alohida.</p>
-  <div class="reveal-sign" id="signature">Eng ezgu tilaklar bilan</div>
+  <div class="reveal-kicker">✦ &nbsp; SENGA ATALGAN KICHIK KOINOT &nbsp; ✦</div>
+  <h2 class="reveal-title" id="reveal-title"></h2>
+  <p class="reveal-message" id="message"></p>
+  <div class="reveal-sign" id="signature"></div>
   <button class="btn close" id="close">Koinotga qaytish</button>
  </div>
 </div>
 
-<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 <script type="module">
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
-import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js';
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
-// Personalize these four values before sharing the surprise.
+// Shaxsiylashtirish: shu yerdagi matnlarni o‘zgartiring.
 const CONFIG = {
   recipient: 'Maxliyo',
   sender: 'Do‘stingdan samimiy tilaklar bilan',
-  message: 'Maxliyo, tug‘ilgan kuning muborak!\n\nYana bir yil — yangi tajribalar, yangi xulosalar va hali javobi topilmagan savollar. Hayot doim ham kutilgandek kechmaydi, lekin unda qiziqarli narsalar yetarlicha.\n\nSenga to‘g‘ri qarorlar, yaxshi imkoniyatlar va o‘zing istagan natijalarga erishishni tilayman. Eng muhimi, qiziqishingni yo‘qotma. Oldinda hali ko‘p kashfiyotlar bor!',
-  revealTitle: 'Yulduzlardan senga xabar'
+  message: 'Maxliyo, yangi yoshing quvonchli lahzalar, katta orzular va unutilmas xotiralarga boy bo‘lsin.\nHar bir kuning bugungidek yorqin, qalbing esa doimo xotirjam bo‘lsin. O‘z nuring bilan porlashda davom et!'
 };
-document.querySelector('#signature').textContent = CONFIG.sender;
-document.querySelector('.reveal-title').innerHTML = 'Maxliyo, tug‘ilgan kuning<br><em>muborak!</em>';
-document.querySelector('#message').textContent = CONFIG.message;
 
+const $ = s => document.querySelector(s);
+const V3 = THREE.Vector3;
 
-function closePhoto(){document.querySelector('#photo-viewer').classList.remove('open');}
-document.querySelector('#photo-close').addEventListener('click',closePhoto);
-document.querySelector('#photo-viewer').addEventListener('click',e=>{if(e.target.id==='photo-viewer')closePhoto();});
-
-const host=document.querySelector('#stage');
-const scene=new THREE.Scene(); scene.background=new THREE.Color(0x050713); scene.fog=new THREE.FogExp2(0x050713,.012);
-const camera=new THREE.PerspectiveCamera(48,innerWidth/innerHeight,.1,900);camera.position.set(0,7.8,30.5);
-const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});
-renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.22;host.appendChild(renderer.domElement);
-const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.dampingFactor=.045;controls.minDistance=10;controls.maxDistance=48;controls.enablePan=false;controls.maxPolarAngle=Math.PI*.82;controls.target.set(0,0,0);
-
-// Lighting: a warm key light and cool atmospheric fill.
-scene.add(new THREE.AmbientLight(0x7184bd,.42));
-const key=new THREE.PointLight(0xffd7a0,170,90,2);key.position.set(-7,8,9);scene.add(key);
-const rim=new THREE.PointLight(0x477bff,120,80,2);rim.position.set(8,-3,-7);scene.add(rim);
-
-// Procedural star field with varied brightness and depth.
-function starField(count,radius,size,opacity=1){
- const p=new Float32Array(count*3), c=new Float32Array(count*3), s=new Float32Array(count);
- for(let i=0;i<count;i++){const u=Math.random()*2-1,a=Math.random()*Math.PI*2,r=radius*(.45+Math.random()*.55),q=Math.sqrt(1-u*u);p[i*3]=r*q*Math.cos(a);p[i*3+1]=r*u;p[i*3+2]=r*q*Math.sin(a);const warm=Math.random();const col=new THREE.Color().setHSL(warm>.82?.11:.58,.25+Math.random()*.35,.68+Math.random()*.3);c.set(col.toArray(),i*3);s[i]=.5+Math.random()*1.5;}
- const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(p,3));g.setAttribute('color',new THREE.BufferAttribute(c,3));g.setAttribute('aScale',new THREE.BufferAttribute(s,1));
- const m=new THREE.PointsMaterial({size,sizeAttenuation:true,vertexColors:true,transparent:true,opacity,depthWrite:false,blending:THREE.AdditiveBlending});
- const pts=new THREE.Points(g,m);scene.add(pts);return pts;
-}
-const starsFar=starField(5200,170,.22,.82),starsNear=starField(1100,95,.42,.9);
-
-// Nebula clouds: layered transparent, softly blurred procedural sprites.
-function nebulaTexture(){
- const canvas=document.createElement('canvas');canvas.width=512;canvas.height=512;const ctx=canvas.getContext('2d');
- const grad=ctx.createRadialGradient(256,256,8,256,256,245);grad.addColorStop(0,'rgba(150,105,255,.48)');grad.addColorStop(.25,'rgba(68,95,205,.24)');grad.addColorStop(.58,'rgba(35,75,145,.09)');grad.addColorStop(1,'rgba(0,0,0,0)');
- ctx.fillStyle=grad;ctx.fillRect(0,0,512,512);
- for(let i=0;i<90;i++){const x=Math.random()*512,y=Math.random()*512,r=10+Math.random()*65;const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,'rgba(120,135,255,.09)');g.addColorStop(1,'rgba(80,100,255,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();}
- return new THREE.CanvasTexture(canvas);
-}
-const nebulaTex=nebulaTexture();
-for(let i=0;i<8;i++){const mat=new THREE.SpriteMaterial({map:nebulaTex,color:new THREE.Color().setHSL(.60+i*.018,.65,.48),transparent:true,opacity:.28+Math.random()*.12,depthWrite:false,blending:THREE.AdditiveBlending});const sp=new THREE.Sprite(mat);sp.position.set((Math.random()-.5)*46,(Math.random()-.5)*25,-18-Math.random()*30);const scale=16+Math.random()*22;sp.scale.set(scale,scale*.66,1);scene.add(sp);}
-
-// Central planet: physical material, procedural surface, atmosphere and rings.
-const planetGroup=new THREE.Group();scene.add(planetGroup);
-const planetGeo=new THREE.SphereGeometry(3.35,128,96);
-const surfaceCanvas=document.createElement('canvas');surfaceCanvas.width=1024;surfaceCanvas.height=512;const cx=surfaceCanvas.getContext('2d');
-const base=cx.createLinearGradient(0,0,1024,512);base.addColorStop(0,'#17254d');base.addColorStop(.35,'#385d91');base.addColorStop(.7,'#172344');base.addColorStop(1,'#6c4567');cx.fillStyle=base;cx.fillRect(0,0,1024,512);
-for(let i=0;i<240;i++){const x=Math.random()*1024,y=Math.random()*512,w=15+Math.random()*150,h=3+Math.random()*28;cx.fillStyle=['rgba(150,183,220,.10)','rgba(7,17,44,.18)','rgba(232,179,151,.08)'][i%3];cx.beginPath();cx.ellipse(x,y,w,h,Math.random()*.5,0,Math.PI*2);cx.fill();}
-const surfaceTex=new THREE.CanvasTexture(surfaceCanvas);surfaceTex.colorSpace=THREE.SRGBColorSpace;
-const planet=new THREE.Mesh(planetGeo,new THREE.MeshStandardMaterial({map:surfaceTex,roughness:.82,metalness:.08}));planetGroup.add(planet);
-const atmosphere=new THREE.Mesh(new THREE.SphereGeometry(3.48,96,72),new THREE.MeshBasicMaterial({color:0x77baff,transparent:true,opacity:.12,side:THREE.BackSide,blending:THREE.AdditiveBlending}));planetGroup.add(atmosphere);
-const halo=new THREE.Mesh(new THREE.SphereGeometry(3.72,96,72),new THREE.MeshBasicMaterial({color:0x547dff,transparent:true,opacity:.055,side:THREE.BackSide,blending:THREE.AdditiveBlending}));planetGroup.add(halo);
-const ring=new THREE.Mesh(new THREE.RingGeometry(4.35,6.15,160),new THREE.MeshBasicMaterial({color:0xc8a8e9,transparent:true,opacity:.35,side:THREE.DoubleSide,depthWrite:false}));ring.rotation.set(1.18,.18,.22);planetGroup.add(ring);
-const ring2=new THREE.Mesh(new THREE.RingGeometry(6.25,6.42,160),new THREE.MeshBasicMaterial({color:0x8ac9ff,transparent:true,opacity:.16,side:THREE.DoubleSide,depthWrite:false}));ring2.rotation.copy(ring.rotation);planetGroup.add(ring2);
-
-// Seven clearly visible orbital paths around the central planet.
-const orbitMat=new THREE.LineBasicMaterial({color:0x8bb9ff,transparent:true,opacity:.19});
-for(const r of [8.25,10.5,12.35,9.15,13.1,11.45,8.85]){
- const pts=[];for(let i=0;i<=240;i++){const a=i/240*Math.PI*2;pts.push(new THREE.Vector3(Math.cos(a)*r,Math.sin(a)*r*.18,Math.sin(a)*r*.72));}
- const line=new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),orbitMat);scene.add(line);
-}
-// Seven small planets orbit the central world; each opens its own photo.
-const photoPlanets=[];
-const orbitRadii=[8.25,10.5,12.35,9.15,13.1,11.45,8.85];
-const planetColors=[0x79a9e8,0xd6a16f,0x9d8bd8,0x6dbbb2,0xd889a6,0xc6b77a,0x7894c8];
-for(let i=0;i<7;i++){
- const pivot=new THREE.Group();pivot.rotation.set(.12+(i%3)*.13,0,(i-3)*.075);scene.add(pivot);
- const radius=orbitRadii[i];
- const sphere=new THREE.Mesh(new THREE.SphereGeometry(.62+(i%3)*.055,48,36),new THREE.MeshStandardMaterial({color:planetColors[i],roughness:.68,metalness:.22,emissive:planetColors[i],emissiveIntensity:.12}));
- sphere.position.set(radius,0,0);sphere.userData.photoIndex=i+1;pivot.add(sphere);
- const glow=new THREE.Mesh(new THREE.SphereGeometry(.74+(i%3)*.055,40,32),new THREE.MeshBasicMaterial({color:planetColors[i],transparent:true,opacity:.10,side:THREE.BackSide,blending:THREE.AdditiveBlending}));
- glow.position.copy(sphere.position);pivot.add(glow);
- if(i===1||i===4){const miniRing=new THREE.Mesh(new THREE.RingGeometry(.82,1.08,72),new THREE.MeshBasicMaterial({color:0xe8d3b0,transparent:true,opacity:.42,side:THREE.DoubleSide,depthWrite:false}));miniRing.position.copy(sphere.position);miniRing.rotation.set(1.1,.2,.25);pivot.add(miniRing);}
- pivot.userData.speed=(i%2===0?1:-1)*(.065+i*.008);pivot.userData.phase=i*Math.PI*2/7;pivot.rotation.y=pivot.userData.phase;photoPlanets.push({pivot,sphere});
+try { main(); } catch (err) {
+  console.error(err);
+  $('#loader').classList.add('done');
+  $('#stage').innerHTML = '<div style="height:100%;display:grid;place-items:center;padding:28px;text-align:center;color:#f5d49a;font:14px system-ui">Bu qurilmada 3D koinotni ishga tushirib bo‘lmadi (WebGL kerak). Boshqa brauzer yoki telefonda urinib ko‘ring.</div>';
 }
 
-// A trail of tiny luminous particles around the main body.
-const dustCount=2600,dustPos=new Float32Array(dustCount*3);for(let i=0;i<dustCount;i++){const a=Math.random()*Math.PI*2,r=4.3+Math.random()*3.4;dustPos[i*3]=Math.cos(a)*r;dustPos[i*3+1]=(Math.random()-.5)*.42;dustPos[i*3+2]=Math.sin(a)*r;}
-const dustGeo=new THREE.BufferGeometry();dustGeo.setAttribute('position',new THREE.BufferAttribute(dustPos,3));const dust=new THREE.Points(dustGeo,new THREE.PointsMaterial({color:0xf0d8ad,size:.035,transparent:true,opacity:.7,depthWrite:false}));planetGroup.add(dust);
+function main() {
+/* ════════════════════ SOZLAMALAR VA SIFAT DARAJASI ════════════════════ */
+const isMobile = matchMedia('(pointer:coarse)').matches || Math.min(innerWidth, innerHeight) < 640;
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const Q = {
+  dpr: Math.min(window.devicePixelRatio || 1, isMobile ? 1.6 : 2),
+  bloom: true,
+  oct: isMobile ? 4 : 5,
+  stars: isMobile ? 2600 : 6500,
+  nearStars: isMobile ? 650 : 1500,
+  orbitDust: isMobile ? 80 : 170,
+  belt: isMobile ? 380 : 900,
+  burst: isMobile ? 320 : 560,
+  seg: isMobile ? 56 : 96
+};
 
-// Subtle floating sparkles in foreground.
-const sparkle=starField(500,24,.08,.75);
+/* ════════════════════ MATN ════════════════════ */
+$('#brand-name').textContent = CONFIG.recipient + ' uchun koinot';
+$('#signature').textContent = CONFIG.sender;
+(function buildTexts() {
+  const title = $('#reveal-title'); let i = 0;
+  const line = (text, em) => {
+    const wrap = document.createElement(em ? 'em' : 'span'); wrap.className = 'ln';
+    const words = text.split(' ');
+    words.forEach((w, wi) => {
+      const ws = document.createElement('span'); ws.className = 'w';
+      [...w].forEach(ch => { const l = document.createElement('span'); l.className = 'l'; l.style.setProperty('--i', i++); l.textContent = ch; ws.appendChild(l); });
+      wrap.appendChild(ws);
+      if (wi < words.length - 1) wrap.appendChild(document.createTextNode(' '));
+    });
+    title.appendChild(wrap);
+  };
+  line(CONFIG.recipient + ', tug‘ilgan kuning', false);
+  line('muborak!', true);
+  const msg = $('#message');
+  CONFIG.message.replace(/\\n/g, '\n').split('\n').forEach((t, k) => {
+    const s = document.createElement('span'); s.className = 'ml'; s.style.setProperty('--k', k); s.textContent = t; msg.appendChild(s);
+  });
+})();
 
-const clock=new THREE.Clock();let revealMode=false;
-function animate(){requestAnimationFrame(animate);const t=clock.getElapsedTime();planet.rotation.y=t*.035;planetGroup.rotation.y=Math.sin(t*.08)*.08;ring.rotation.z+=.00045;dust.rotation.y=-t*.012;starsFar.rotation.y=t*.0018;starsNear.rotation.y=-t*.003;sparkle.rotation.y=t*.004;photoPlanets.forEach(({pivot,sphere})=>{pivot.rotation.y=pivot.userData.phase+t*pivot.userData.speed;sphere.rotation.y=t*.18;});controls.update();renderer.render(scene,camera);}
-animate();
-const loader=document.querySelector('#loader');setTimeout(()=>loader.classList.add('done'),650);
-// Tabrik faqat markazdagi katta sayyora bosilganda ochiladi.
-const raycaster=new THREE.Raycaster(), pointer=new THREE.Vector2();
-let downX=0,downY=0;
-renderer.domElement.style.cursor='grab';
-renderer.domElement.addEventListener('pointerdown',e=>{downX=e.clientX;downY=e.clientY;});
-renderer.domElement.addEventListener('pointerup',e=>{
- if(Math.hypot(e.clientX-downX,e.clientY-downY)>9)return;
- const rect=renderer.domElement.getBoundingClientRect();
- pointer.x=((e.clientX-rect.left)/rect.width)*2-1;
- pointer.y=-((e.clientY-rect.top)/rect.height)*2+1;
- raycaster.setFromCamera(pointer,camera);
- // Raycast complete orbit groups recursively, including transformed child planets.
- const photoHits=raycaster.intersectObjects(photoPlanets.map(p=>p.pivot),true);
- const photoHit=photoHits.find(hit=>Number.isInteger(hit.object.userData.photoIndex));
- if(photoHit){
-  const index=photoHit.object.userData.photoIndex;
-  const viewer=document.querySelector('#photo-viewer');
-  const image=document.querySelector('#photo-large');
-  image.onerror=()=>{image.onerror=null;image.src='./assets/photo-'+index+'.jpg';};
-  image.src=new URL('./assets/photo-'+index+'.jpg',document.baseURI).href;
-  viewer.classList.add('open');
-  return;
- }
- if(raycaster.intersectObject(planet,true).length)document.querySelector('#reveal').classList.add('show');
+/* ════════════════════ RENDERER, SAHNA, KAMERA ════════════════════ */
+const host = $('#stage');
+const renderer = new THREE.WebGLRenderer({ antialias: !isMobile, alpha: false, powerPreference: 'high-performance' });
+renderer.setPixelRatio(Q.dpr);
+renderer.setSize(innerWidth, innerHeight);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.NoToneMapping;
+renderer.setClearColor(0x03040c, 1);
+host.appendChild(renderer.domElement);
+const dom = renderer.domElement;
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(48, innerWidth / innerHeight, 0.1, 2000);
+
+const U_TIME = { value: 0 }, U_PR = { value: Q.dpr };
+const SUN = new V3(-0.62, 0.26, 0.74).normalize();
+const ORIGIN = new V3();
+const Y_AXIS = new V3(0, 1, 0);
+
+/* ════════════════════ GLSL BO‘LAKLARI ════════════════════ */
+const NOISE = `
+float hash(vec3 p){p=fract(p*0.3183099+.1);p*=17.0;return fract(p.x*p.y*p.z*(p.x+p.y+p.z));}
+float vnoise(vec3 x){vec3 i=floor(x),f=fract(x);f=f*f*(3.0-2.0*f);
+ return mix(mix(mix(hash(i),hash(i+vec3(1.,0.,0.)),f.x),mix(hash(i+vec3(0.,1.,0.)),hash(i+vec3(1.,1.,0.)),f.x),f.y),
+            mix(mix(hash(i+vec3(0.,0.,1.)),hash(i+vec3(1.,0.,1.)),f.x),mix(hash(i+vec3(0.,1.,1.)),hash(i+vec3(1.,1.,1.)),f.x),f.y),f.z);}
+float fbm(vec3 p){float a=.5,s=0.;for(int i=0;i<OCT;i++){s+=a*vnoise(p);p=p*2.02+vec3(1.7,9.2,3.1);a*=.5;}return s;}
+`;
+
+// Sayyora va atmosfera qobig‘i uchun umumiy vertex shader
+const VS_BODY = `
+varying vec3 vObj; varying vec3 vN; varying vec3 vW; varying vec3 vC;
+void main(){
+ vObj=position; vN=normalize(mat3(modelMatrix)*normal);
+ vC=(modelMatrix*vec4(0.,0.,0.,1.)).xyz;
+ vec4 w=modelMatrix*vec4(position,1.); vW=w.xyz;
+ gl_Position=projectionMatrix*viewMatrix*w;
+}`;
+
+const PLANET_FS = NOISE + `
+uniform vec3 uC0,uC1,uC2,uC3,uAtmo,uSunDir,uCloudCol,uSpotCol;
+uniform float uBandMix,uBandFreq,uScale,uSeed,uContrast,uCloud,uVein,uSpot,uGlow,uFill,uTime;
+varying vec3 vObj; varying vec3 vN; varying vec3 vW;
+void main(){
+ vec3 p=normalize(vObj);
+ vec3 q=p*uScale+vec3(uSeed,uSeed*.73,uSeed*1.31);
+ float warp=fbm(q*1.4+vec3(0.,uTime*.012,0.));
+ float n=fbm(q+warp*.9);
+ float lat=p.y+(warp-.5)*.30;
+ float b1=sin(lat*uBandFreq+n*2.6)*.5+.5, b2=sin(lat*uBandFreq*2.9+n*5.0+1.3)*.5+.5;
+ float bands=.2+.68*(.74*b1+.26*b2);
+ float t=mix(n*1.15,bands,uBandMix);
+ t+=(fbm(q*3.1)-.5)*.22;
+ float sd=distance(p,normalize(vec3(.62,-.28,.73)));
+ float spot=smoothstep(.34,.05,sd)*uSpot;
+ t=mix(t,.97,spot*.75);
+ t=clamp((t-.5)*uContrast+.5,0.,1.);
+ vec3 col=mix(uC0,uC1,smoothstep(.0,.4,t));
+ col=mix(col,uC2,smoothstep(.34,.7,t));
+ col=mix(col,uC3,smoothstep(.64,.97,t));
+ col=mix(col,uSpotCol,spot*.6);
+ col*=.82+.36*fbm(q*7.5);
+ float cl=smoothstep(.5,.74,fbm(q*2.3+warp*1.6+vec3(uTime*.02,0.,0.)));
+ col=mix(col,uCloudCol,cl*uCloud);
+ float ridge=1.-abs(fbm(q*2.2)*2.-1.);
+ float vein=smoothstep(.95,.99,ridge)*uVein;
+
+ vec3 N=normalize(vN),V=normalize(cameraPosition-vW),L=normalize(uSunDir);
+ float ndl=dot(N,L);
+ float diff=max(ndl,0.);
+ float wrap=smoothstep(-.2,.4,ndl);
+ vec3 lit=col*(.05+1.25*mix(diff,wrap,.3));
+ float term=smoothstep(-.02,.2,ndl)*(1.-smoothstep(.2,.5,ndl));
+ lit+=col*vec3(1.,.5,.25)*term*.35;
+ lit+=col*vec3(.05,.07,.16)*(1.-wrap)*.9;
+ float ndv=max(dot(N,V),0.);
+ float fres=pow(1.-ndv,3.);
+ lit+=uAtmo*fres*(.12+.9*wrap)*1.15;
+ lit+=col*uFill*(.25+.75*ndv)*.9;
+ lit+=vec3(1.,.42,.12)*vein*(1.-.5*wrap)*1.7;
+ lit+=uAtmo*uGlow*(.25+fres*1.4);
+ gl_FragColor=vec4(lit,1.);
+ #include <colorspace_fragment>
+}`;
+
+const SHELL_FS = `
+uniform vec3 uColor,uSunDir; uniform float uDmax,uPow,uIntensity;
+varying vec3 vObj; varying vec3 vN; varying vec3 vW; varying vec3 vC;
+void main(){
+ vec3 N=normalize(vN),V=normalize(cameraPosition-vW);
+ float d=abs(dot(N,V));
+ float a=pow(clamp(d/uDmax,0.,1.),uPow);
+ float sun=.3+.7*smoothstep(-.35,.6,dot(normalize(vW-vC),normalize(uSunDir)));
+ gl_FragColor=vec4(uColor*a*sun*uIntensity,a*sun*uIntensity);
+ #include <colorspace_fragment>
+}`;
+
+const RING_VS = `
+varying vec3 vLocal; varying vec3 vW;
+void main(){ vLocal=position; vec4 w=modelMatrix*vec4(position,1.); vW=w.xyz; gl_Position=projectionMatrix*viewMatrix*w; }`;
+const RING_FS = NOISE + `
+uniform float uInner,uOuter,uSeed,uAlpha,uPlanetR,uFreq;
+uniform vec3 uColA,uColB,uSunDir,uCenter;
+varying vec3 vLocal; varying vec3 vW;
+void main(){
+ float r=length(vLocal.xy);
+ float t=(r-uInner)/(uOuter-uInner);
+ float d=.5*vnoise(vec3(t*14.*uFreq,uSeed,0.))+.3*vnoise(vec3(t*47.*uFreq,uSeed+3.,1.))+.2*vnoise(vec3(t*130.*uFreq,uSeed+7.,2.));
+ d=smoothstep(.2,.82,d);
+ d*=smoothstep(.0,.022,abs(t-.64));
+ d*=mix(.3,1.,smoothstep(.0,.012,abs(t-.31)));
+ float edge=smoothstep(.0,.05,t)*smoothstep(1.,.9,t);
+ vec3 L=normalize(uSunDir); vec3 oc=vW-uCenter; float b=dot(oc,L);
+ float dmin=sqrt(max(dot(oc,oc)-b*b,0.));
+ float sh=b<0.?smoothstep(uPlanetR*.97,uPlanetR*1.05,dmin):1.;
+ vec3 col=mix(uColA,uColB,vnoise(vec3(t*30.*uFreq,uSeed,5.)));
+ col*=.1+1.0*sh;
+ gl_FragColor=vec4(col,d*edge*uAlpha);
+ #include <colorspace_fragment>
+}`;
+
+const ORBIT_VS = `varying vec2 vP; void main(){ vP=position.xy; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }`;
+const ORBIT_FS = `
+uniform float uR,uTheta,uDir,uBase,uTrail,uCore; uniform vec3 uColor,uColorT;
+varying vec2 vP;
+void main(){
+ float dr=abs(length(vP)-uR);
+ float prof=exp(-dr*dr/(uCore*uCore*.36))+.07*exp(-dr*dr/(uCore*uCore*14.));
+ float ang=atan(vP.y,vP.x);
+ float d=mod((uTheta-ang)*uDir,6.2831853);
+ float trail=exp(-d*uTrail);
+ float head=exp(-pow(min(d,6.2831853-d)*5.,2.));
+ vec3 col=mix(uColor,uColorT,clamp(trail*1.2+head,0.,1.));
+ float a=prof*(uBase+.62*trail+.25*head);
+ gl_FragColor=vec4(col,a);
+ #include <colorspace_fragment>
+}`;
+
+const PT_VS = `
+attribute float aScale; attribute float aPhase; attribute vec3 aColor;
+uniform float uSize,uPR,uTime,uAtten;
+varying vec3 vC; varying float vT;
+void main(){
+ vec4 mv=modelViewMatrix*vec4(position,1.);
+ vT=.62+.38*sin(uTime*(.6+aPhase*1.8)+aPhase*40.);
+ vC=aColor;
+ float s=aScale*uSize*uPR;
+ s*=mix(1.,32./max(-mv.z,1.),uAtten);
+ gl_PointSize=clamp(s,1.,72.);
+ gl_Position=projectionMatrix*mv;
+}`;
+const PT_FS = `
+uniform float uOpacity; varying vec3 vC; varying float vT;
+void main(){
+ float d=length(gl_PointCoord-.5);
+ float a=smoothstep(.5,.0,d); a=a*a*vT*uOpacity;
+ gl_FragColor=vec4(vC*1.5,a);
+ #include <colorspace_fragment>
+}`;
+
+const BURST_VS = `
+attribute vec3 aVel; attribute float aSeed;
+uniform float uT,uLife,uSize,uPR,uK,uSpeed; uniform vec3 uOrigin;
+varying float vA; varying float vS;
+void main(){
+ vec3 p=uOrigin+aVel*uSpeed*((1.-exp(-uK*uT))/uK);
+ float life=uLife*(.55+.45*aSeed);
+ float f=clamp(uT/life,0.,1.);
+ vA=(1.-f)*(1.-f)*step(uT,life); vS=aSeed;
+ vec4 mv=viewMatrix*vec4(p,1.);
+ gl_PointSize=clamp(uSize*uPR*(1.-f*.5)*(.5+aSeed)*(36./max(-mv.z,1.)),1.,90.);
+ gl_Position=projectionMatrix*mv;
+}`;
+const BURST_FS = `
+uniform vec3 uColor; varying float vA; varying float vS;
+void main(){
+ float d=length(gl_PointCoord-.5);
+ float a=smoothstep(.5,.0,d); a*=a*vA;
+ vec3 c=mix(uColor,vec3(1.,.97,.9),vS*.5);
+ gl_FragColor=vec4(c*1.6,a);
+ #include <colorspace_fragment>
+}`;
+
+const SKY_VS = `varying vec3 vDir; void main(){ vDir=position; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }`;
+const SKY_FS = NOISE + `
+uniform vec3 uBand,uBlue,uViolet,uGold,uTeal;
+varying vec3 vDir;
+void main(){
+ vec3 d=normalize(vDir);
+ float bd=dot(d,uBand);
+ float band=exp(-pow(bd*2.4,2.));
+ float broad=exp(-pow(bd*1.05,2.));
+ float w1=fbm(d*1.9+vec3(3.1,1.7,.4));
+ float w2=fbm(d*3.6+w1*1.8+vec3(7.7,2.2,5.1));
+ float w3=fbm(d*7.5+w2*1.2+vec3(1.3,8.8,2.9));
+ float c1=smoothstep(.44,.82,w1)*(.12+.9*broad);
+ float c2=smoothstep(.46,.82,w2)*(.1+1.1*band);
+ float c3=smoothstep(.45,.85,w3)*band;
+ vec3 col=vec3(.002,.003,.011);
+ col+=uBlue*c1*.26+uViolet*c2*.42+uTeal*smoothstep(.5,.9,w2*w1*1.6)*band*.16+uGold*c3*w1*.4;
+ float dust=smoothstep(.5,.78,fbm(d*5.+vec3(9.,1.,3.)));
+ col*=1.-dust*band*.55;
+ col+=vec3(.3,.36,.6)*pow(band,3.)*fbm(d*28.)*.07;
+ gl_FragColor=vec4(col,1.);
+ #include <colorspace_fragment>
+}`;
+
+/* ════════════════════ MATERIAL FABRIKALARI ════════════════════ */
+function planetMaterial(o) {
+  const C = c => new THREE.Color(c);
+  return new THREE.ShaderMaterial({
+    defines: { OCT: Q.oct },
+    uniforms: {
+      uC0: { value: C(o.pal[0]) }, uC1: { value: C(o.pal[1]) }, uC2: { value: C(o.pal[2]) }, uC3: { value: C(o.pal[3]) },
+      uAtmo: { value: C(o.atmo) }, uSunDir: { value: SUN.clone() },
+      uCloudCol: { value: C(o.cloudCol || 0xffffff) }, uSpotCol: { value: C(o.spotCol || 0xffffff) },
+      uBandMix: { value: o.bandMix }, uBandFreq: { value: o.bandFreq || 10 }, uScale: { value: o.scale || 1.2 },
+      uSeed: { value: o.seed || 1 }, uContrast: { value: o.contrast || 1 }, uCloud: { value: o.cloud || 0 },
+      uVein: { value: o.vein || 0 }, uSpot: { value: o.spot || 0 }, uGlow: { value: 0 }, uFill: { value: 0 }, uTime: U_TIME
+    },
+    vertexShader: VS_BODY, fragmentShader: PLANET_FS
+  });
+}
+function shellMaterial(color, inv) {
+  return new THREE.ShaderMaterial({
+    uniforms: { uColor: { value: new THREE.Color(color) }, uSunDir: { value: SUN.clone() }, uDmax: { value: Math.sqrt(1 - inv * inv) }, uPow: { value: 2.6 }, uIntensity: { value: 1 } },
+    vertexShader: VS_BODY, fragmentShader: SHELL_FS,
+    transparent: true, depthWrite: false, side: THREE.BackSide, blending: THREE.AdditiveBlending
+  });
+}
+function ringMaterial(o) {
+  return new THREE.ShaderMaterial({
+    defines: { OCT: Q.oct },
+    uniforms: {
+      uInner: { value: o.inner }, uOuter: { value: o.outer }, uFreq: { value: o.freq || 1 }, uSeed: { value: o.seed || 1 }, uAlpha: { value: o.alpha || .9 },
+      uPlanetR: { value: o.planetR }, uColA: { value: new THREE.Color(o.colA) }, uColB: { value: new THREE.Color(o.colB) },
+      uSunDir: { value: SUN.clone() }, uCenter: { value: new V3() }
+    },
+    vertexShader: RING_VS, fragmentShader: RING_FS, transparent: true, depthWrite: false, side: THREE.DoubleSide
+  });
+}
+const ORBIT_CORE = { value: 0.05 };
+function orbitMaterial(r, colorT, dir) {
+  return new THREE.ShaderMaterial({
+    uniforms: {
+      uR: { value: r }, uTheta: { value: 0 }, uDir: { value: dir }, uBase: { value: 0.2 }, uTrail: { value: 1.5 }, uCore: ORBIT_CORE,
+      uColor: { value: new THREE.Color(0x8fb4ff) }, uColorT: { value: new THREE.Color(colorT).lerp(new THREE.Color(0xffffff), .35) }
+    },
+    vertexShader: ORBIT_VS, fragmentShader: ORBIT_FS, transparent: true, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending
+  });
+}
+function pointsMaterial(size, atten, opacity) {
+  return new THREE.ShaderMaterial({
+    uniforms: { uSize: { value: size }, uPR: U_PR, uTime: U_TIME, uAtten: { value: atten }, uOpacity: { value: opacity } },
+    vertexShader: PT_VS, fragmentShader: PT_FS, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending
+  });
+}
+function makePoints(count, fill, material) {
+  const pos = new Float32Array(count * 3), col = new Float32Array(count * 3), sc = new Float32Array(count), ph = new Float32Array(count);
+  const o = { p: new V3(), c: new THREE.Color(), s: 1 };
+  for (let i = 0; i < count; i++) {
+    fill(i, o);
+    pos[i * 3] = o.p.x; pos[i * 3 + 1] = o.p.y; pos[i * 3 + 2] = o.p.z;
+    col[i * 3] = o.c.r; col[i * 3 + 1] = o.c.g; col[i * 3 + 2] = o.c.b;
+    sc[i] = o.s; ph[i] = Math.random();
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  g.setAttribute('aColor', new THREE.BufferAttribute(col, 3));
+  g.setAttribute('aScale', new THREE.BufferAttribute(sc, 1));
+  g.setAttribute('aPhase', new THREE.BufferAttribute(ph, 1));
+  const m = new THREE.Points(g, material); m.frustumCulled = false; return m;
+}
+const gauss = () => (Math.random() + Math.random() + Math.random() - 1.5) / 1.5;
+function randDir(out) { const u = Math.random() * 2 - 1, a = Math.random() * Math.PI * 2, q = Math.sqrt(1 - u * u); return out.set(q * Math.cos(a), u, q * Math.sin(a)); }
+
+/* ════════════════════ KOINOT FONI: tumanliklar bir marta pishiriladi ════════════════════ */
+const BAND = new V3(0.28, 0.92, 0.26).normalize();
+(function bakeSky() {
+  const sky = new THREE.Mesh(new THREE.SphereGeometry(60, 48, 32), new THREE.ShaderMaterial({
+    defines: { OCT: 6 },
+    uniforms: { uBand: { value: BAND }, uBlue: { value: new THREE.Color(0x2c58d8) }, uViolet: { value: new THREE.Color(0x6a2fc0) }, uGold: { value: new THREE.Color(0xd49a38) }, uTeal: { value: new THREE.Color(0x1d8fb0) } },
+    vertexShader: SKY_VS, fragmentShader: SKY_FS, side: THREE.BackSide, depthWrite: false
+  }));
+  const skyScene = new THREE.Scene(); skyScene.add(sky);
+  const rt = new THREE.WebGLCubeRenderTarget(isMobile ? 512 : 1024, { type: THREE.HalfFloatType, generateMipmaps: false, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter });
+  new THREE.CubeCamera(0.1, 200, rt).update(renderer, skyScene);
+  scene.background = rt.texture;
+  sky.geometry.dispose(); sky.material.dispose();
+})();
+
+/* ════════════════════ YULDUZLAR ════════════════════ */
+const farStars = makePoints(Q.stars, (i, o) => {
+  randDir(o.p);
+  if (Math.random() < 0.5) o.p.addScaledVector(BAND, -o.p.dot(BAND) * 0.86).normalize(); // Somon yo‘li zichligi
+  o.p.multiplyScalar(450 + Math.random() * 300);
+  const r = Math.random();
+  if (r > 0.9) o.c.setRGB(1.0, 0.72, 0.42); else if (r > 0.45) o.c.setRGB(0.66, 0.78, 1.0); else o.c.setRGB(0.92, 0.94, 1.0);
+  o.c.multiplyScalar(0.5 + Math.random() * 0.8);
+  o.s = Math.random() > 0.985 ? 4.2 : 1.1 + Math.random() * 1.9;
+}, pointsMaterial(1.0, 0, 1));
+scene.add(farStars);
+
+const nearStars = makePoints(Q.nearStars, (i, o) => {
+  randDir(o.p).multiplyScalar(26 + Math.random() * 120);
+  o.c.setRGB(0.7, 0.8, 1.0).multiplyScalar(0.25 + Math.random() * 0.5);
+  if (Math.random() > 0.85) o.c.setRGB(1.0, 0.8, 0.55).multiplyScalar(0.5);
+  o.s = 0.6 + Math.random() * 1.1;
+}, pointsMaterial(1.0, 1, 0.9));
+scene.add(nearStars);
+
+/* ════════════════════ YORUG‘LIK MANBAI (quyosh) ════════════════════ */
+function glowTexture() {
+  const c = document.createElement('canvas'); c.width = c.height = 256; const g = c.getContext('2d');
+  const gr = g.createRadialGradient(128, 128, 0, 128, 128, 128);
+  gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(.12, 'rgba(255,240,210,.8)'); gr.addColorStop(.35, 'rgba(255,200,130,.22)'); gr.addColorStop(1, 'rgba(255,180,100,0)');
+  g.fillStyle = gr; g.fillRect(0, 0, 256, 256);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+function ringTexture() {
+  const c = document.createElement('canvas'); c.width = c.height = 256; const g = c.getContext('2d');
+  const gr = g.createRadialGradient(128, 128, 70, 128, 128, 126);
+  gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(.7, 'rgba(255,255,255,0)'); gr.addColorStop(.86, 'rgba(255,238,200,.9)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = gr; g.fillRect(0, 0, 256, 256);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+const GLOW_TEX = glowTexture(), RING_TEX = ringTexture();
+const sunSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: GLOW_TEX, color: 0xffe0b0, transparent: true, opacity: 0.95, depthWrite: false, blending: THREE.AdditiveBlending, fog: false }));
+sunSprite.position.copy(SUN).multiplyScalar(380); sunSprite.scale.setScalar(150); scene.add(sunSprite);
+
+/* ════════════════════ MARKAZIY SAYYORA ════════════════════ */
+const R = 3.3;
+const planetGroup = new THREE.Group(); planetGroup.rotation.z = 0.30; scene.add(planetGroup);
+const central = new THREE.Mesh(new THREE.SphereGeometry(R, Q.seg * 2, Q.seg + 16), planetMaterial({
+  pal: [0x121842, 0x39509f, 0xc49b72, 0xf2e1c0], bandMix: 0.74, bandFreq: 21, scale: 1.15, seed: 2.7, contrast: 1.05,
+  spot: 1, spotCol: 0xd9795a, atmo: 0x8fb8ff
+}));
+planetGroup.add(central);
+planetGroup.add(new THREE.Mesh(new THREE.SphereGeometry(R * 1.09, 64, 48), shellMaterial(0x7fb2ff, 1 / 1.09)));
+planetGroup.add(new THREE.Mesh(new THREE.SphereGeometry(R * 1.22, 48, 36), (() => { const m = shellMaterial(0x6a55ff, 1 / 1.22); m.uniforms.uIntensity.value = 0.45; m.uniforms.uPow.value = 3.4; return m; })()));
+
+const mainRing = new THREE.Mesh(new THREE.RingGeometry(4.5, 7.3, 256, 1), ringMaterial({ inner: 4.5, outer: 7.3, seed: 3.1, alpha: 0.92, planetR: R, colA: 0xf3dfb8, colB: 0xa795d6 }));
+mainRing.rotation.x = -Math.PI / 2; planetGroup.add(mainRing);
+const outerRing = new THREE.Mesh(new THREE.RingGeometry(7.5, 7.85, 256, 1), ringMaterial({ inner: 7.5, outer: 7.85, seed: 9.4, alpha: 0.5, freq: 0.5, planetR: R, colA: 0xd9c9f0, colB: 0xf2e2c0 }));
+outerRing.rotation.x = -Math.PI / 2; planetGroup.add(outerRing);
+
+const belt = makePoints(Q.belt, (i, o) => {
+  const a = Math.random() * Math.PI * 2, r = 4.3 + Math.pow(Math.random(), 0.8) * 3.7;
+  o.p.set(Math.cos(a) * r, gauss() * 0.09, Math.sin(a) * r);
+  o.c.setRGB(1.0, 0.86, 0.62).lerp(new THREE.Color(0.7, 0.62, 1), Math.random() * 0.6).multiplyScalar(0.5 + Math.random() * 0.5);
+  o.s = 0.5 + Math.random() * 0.8;
+}, pointsMaterial(1.0, 1, 0.9));
+planetGroup.add(belt);
+
+const centralHit = new THREE.Mesh(new THREE.SphereGeometry(R * 1.05, 24, 18), new THREE.MeshBasicMaterial({ visible: false }));
+centralHit.userData = { kind: 'center' }; scene.add(centralHit);
+
+/* ════════════════════ 7 TA KICHIK SAYYORA ════════════════════ */
+const PL = [
+  { size: .80, pal: [0x041d3f, 0x0e5aa7, 0x2d8f6a, 0xc7b27a], bandMix: 0, scale: 1.6, seed: 4.2, contrast: 2.4, cloud: .85, atmo: 0x7ec8ff },                              // okean dunyosi
+  { size: .74, pal: [0x150a09, 0x3a1812, 0x7a3418, 0xc2672b], bandMix: 0, scale: 2.0, seed: 1.9, contrast: 1.7, vein: 1, atmo: 0xff8a50 },                                // lava
+  { size: .84, pal: [0x8a5a34, 0xd7a76a, 0xf1d9a8, 0xb27a4a], bandMix: .93, bandFreq: 22, scale: 1.2, seed: 7.7, contrast: 1.25, atmo: 0xffd39a, ring: { a: 0xf0d9b0, b: 0xb99a6c } }, // halqali gaz giganti
+  { size: .78, pal: [0x1b4f7a, 0x3f93c4, 0x8fd6ec, 0xd8f4fb], bandMix: .6, bandFreq: 10, scale: 1.1, seed: 3.3, contrast: 1.3, cloud: .25, atmo: 0x9be7ff },               // muz giganti
+  { size: .86, pal: [0x2a1550, 0x6a3fb0, 0xb07be0, 0xf0c8ff], bandMix: .85, bandFreq: 16, scale: 1.3, seed: 8.8, contrast: 1.3, atmo: 0xc79bff, ring: { a: 0xe6d2ff, b: 0x9b7be0 } }, // binafsha, halqali
+  { size: .76, pal: [0x06352f, 0x0f7a62, 0x58c29a, 0xe8f5d0], bandMix: .45, bandFreq: 12, scale: 1.5, seed: 5.5, contrast: 1.6, cloud: .35, atmo: 0x7fffd0 },              // zumrad
+  { size: .80, pal: [0x5a2540, 0xc4687a, 0xf0a98c, 0xffe2b8], bandMix: .8, bandFreq: 18, scale: 1.2, seed: 6.1, contrast: 1.25, atmo: 0xffb3a0 }                         // pushti-oltin
+];
+const RADII = PL.map((_, i) => 8.4 + i * 1.35);                      // markazdan teng masofadagi orbitalar
+const SPEEDS = [0.30, 0.245, 0.20, 0.16, 0.125, 0.098, 0.078];       // har birining tezligi har xil
+const PHASES = [0.4, 2.5, 4.4, 1.3, 3.3, 5.4, 0.9];
+const TILT_X = [.05, -.08, .11, -.05, .09, -.12, .06], TILT_Z = [.04, -.05, .07, -.06, .03, .06, -.04];
+
+let smallScale = 1;
+const planets = [];
+const pickables = [centralHit];
+PL.forEach((d, i) => {
+  const group = new THREE.Group(); group.rotation.set(TILT_X[i], 0, TILT_Z[i]); scene.add(group);
+  const pivot = new THREE.Group(); group.add(pivot);
+  const holder = new THREE.Group(); holder.position.set(RADII[i], 0, 0); pivot.add(holder);
+
+  const mat = planetMaterial(d);
+  const mesh = new THREE.Mesh(new THREE.SphereGeometry(d.size, Q.seg, Math.round(Q.seg * 0.75)), mat); holder.add(mesh);
+  const shellMat = shellMaterial(d.atmo, 1 / 1.14);
+  holder.add(new THREE.Mesh(new THREE.SphereGeometry(d.size * 1.14, 40, 30), shellMat));
+  const hit = new THREE.Mesh(new THREE.SphereGeometry(d.size * 1.5, 12, 10), new THREE.MeshBasicMaterial({ visible: false }));
+  hit.userData = { kind: 'photo', index: i }; holder.add(hit); pickables.push(hit);
+
+  const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: GLOW_TEX, color: d.atmo, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending }));
+  halo.scale.setScalar(d.size * 6); halo.visible = false; holder.add(halo);
+
+  let ringMesh = null;
+  if (d.ring) {
+    ringMesh = new THREE.Mesh(new THREE.RingGeometry(d.size * 1.5, d.size * 2.4, 128, 1), ringMaterial({ inner: d.size * 1.5, outer: d.size * 2.4, seed: 2 + i * 3.7, alpha: 0.92, freq: 0.3, planetR: d.size, colA: d.ring.a, colB: d.ring.b }));
+    ringMesh.rotation.set(-Math.PI / 2 + 0.38, 0, 0.25); holder.add(ringMesh);
+  }
+
+  const orbit = new THREE.Mesh(new THREE.RingGeometry(RADII[i] - 0.6, RADII[i] + 0.6, 360, 1), orbitMaterial(RADII[i], d.atmo, Math.sign(SPEEDS[i])));
+  orbit.rotation.x = -Math.PI / 2; group.add(orbit);
+
+  const dustCol = new THREE.Color(d.atmo).lerp(new THREE.Color(0xffffff), 0.5);
+  const dust = makePoints(Q.orbitDust, (k, o) => {
+    const a = Math.random() * Math.PI * 2, r = RADII[i] + gauss() * 0.22;
+    o.p.set(Math.cos(a) * r, gauss() * 0.1, Math.sin(a) * r);
+    o.c.copy(dustCol).multiplyScalar(0.35 + Math.random() * 0.55); o.s = 0.4 + Math.random() * 0.7;
+  }, pointsMaterial(1.0, 1, 0.9));
+  group.add(dust);
+
+  planets.push({ d, group, pivot, holder, mesh, mat, shellMat, halo, ringMesh, orbit, dust, theta: PHASES[i], speed: SPEEDS[i], spin: 0.25 + i * 0.04, glow: 0 });
 });
-renderer.domElement.addEventListener('pointermove',e=>{
- const rect=renderer.domElement.getBoundingClientRect();
- pointer.x=((e.clientX-rect.left)/rect.width)*2-1;
- pointer.y=-((e.clientY-rect.top)/rect.height)*2+1;
- raycaster.setFromCamera(pointer,camera);
- renderer.domElement.style.cursor=(raycaster.intersectObject(planet,true).length||raycaster.intersectObjects(photoPlanets.map(p=>p.pivot),true).some(hit=>Number.isInteger(hit.object.userData.photoIndex)))?'pointer':'grab';
+function applyScale() {
+  planets.forEach(p => {
+    p.holder.scale.setScalar(smallScale);
+    if (p.ringMesh) p.ringMesh.material.uniforms.uPlanetR.value = p.d.size * smallScale;
+  });
+}
+
+/* ════════════════════ EFFEKTLAR: portlash va zarba to‘lqini ════════════════════ */
+const burst = (() => {
+  const n = Q.burst, vel = new Float32Array(n * 3), seed = new Float32Array(n), pos = new Float32Array(n * 3), tmp = new V3();
+  for (let i = 0; i < n; i++) { randDir(tmp).multiplyScalar(0.25 + Math.random() * 0.75); vel.set([tmp.x, tmp.y, tmp.z], i * 3); seed[i] = Math.random(); }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('aVel', new THREE.BufferAttribute(vel, 3)); g.setAttribute('aSeed', new THREE.BufferAttribute(seed, 1));
+  const m = new THREE.ShaderMaterial({
+    uniforms: { uT: { value: 0 }, uLife: { value: 2 }, uSize: { value: 4 }, uPR: U_PR, uK: { value: 1.6 }, uSpeed: { value: 8 }, uOrigin: { value: new V3() }, uColor: { value: new THREE.Color(0xffd79a) } },
+    vertexShader: BURST_VS, fragmentShader: BURST_FS, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending
+  });
+  const mesh = new THREE.Points(g, m); mesh.frustumCulled = false; mesh.visible = false; scene.add(mesh);
+  return {
+    mesh, active: false,
+    fire(origin, color, speed, life, size) {
+      const u = m.uniforms; u.uOrigin.value.copy(origin); u.uColor.value.set(color); u.uSpeed.value = speed; u.uLife.value = life; u.uSize.value = size; u.uT.value = 0;
+      mesh.visible = true; this.active = true;
+    },
+    update(dt) { if (!this.active) return; const u = m.uniforms; u.uT.value += dt; if (u.uT.value > u.uLife.value) { this.active = false; mesh.visible = false; } }
+  };
+})();
+const shock = (() => {
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: RING_TEX, color: 0xffe6b0, transparent: true, opacity: 0, depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending }));
+  s.visible = false; s.renderOrder = 20; scene.add(s);
+  return {
+    t: 1, dur: 1.4, max: 10, active: false,
+    fire(origin, color, max, dur) { s.position.copy(origin); s.material.color.set(color); this.max = max; this.dur = dur; this.t = 0; this.active = true; s.visible = true; },
+    update(dt) {
+      if (!this.active) return; this.t += dt / this.dur; const f = Math.min(this.t, 1), e = 1 - Math.pow(1 - f, 3);
+      s.scale.setScalar(0.3 + e * this.max); s.material.opacity = Math.pow(1 - f, 1.6) * 0.95;
+      if (f >= 1) { this.active = false; s.visible = false; }
+    }
+  };
+})();
+
+/* ════════════════════ POST-PROCESSING (yengil bloom) ════════════════════ */
+const rt = new THREE.WebGLRenderTarget(innerWidth * Q.dpr, innerHeight * Q.dpr, { type: THREE.HalfFloatType, samples: isMobile ? 0 : 4 });
+const composer = new EffectComposer(renderer, rt);
+composer.setPixelRatio(Q.dpr); composer.setSize(innerWidth, innerHeight);
+composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), isMobile ? 0.5 : 0.62, 0.7, 0.88);
+composer.addPass(bloom);
+composer.addPass(new OutputPass());
+
+/* ════════════════════ KAMERA VA BOSHQARUV ════════════════════ */
+const controls = new OrbitControls(camera, dom);
+controls.enableDamping = true; controls.dampingFactor = 0.05; controls.enablePan = false;
+controls.rotateSpeed = 0.6; controls.zoomSpeed = 0.7; controls.minDistance = 9; controls.minPolarAngle = 0.15; controls.maxPolarAngle = Math.PI * 0.9;
+controls.autoRotate = !reduceMotion; controls.autoRotateSpeed = 0.35;
+let autoTimer = 0;
+controls.addEventListener('start', () => { controls.autoRotate = false; clearTimeout(autoTimer); });
+controls.addEventListener('end', () => { clearTimeout(autoTimer); autoTimer = setTimeout(() => { if (mode === 'overview' && !reduceMotion) controls.autoRotate = true; }, 3500); });
+
+let portrait = innerWidth < innerHeight;
+const camElev = () => (portrait ? 0.62 : 0.36);
+function fitDistance() {
+  const a = innerWidth / innerHeight, t = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+  const H = a < 1 ? 15.8 : 20.5, V = a < 1 ? 9 : 11.5;
+  return Math.max(H / (t * a), V / t);
+}
+function applyLayout(reposition) {
+  camera.fov = portrait ? 58 : 48;
+  camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+  smallScale = portrait ? 1.55 : 1; applyScale();
+  const d = fitDistance(); controls.maxDistance = d * 1.7;
+  if (reposition) { const el = camElev(); camera.position.set(0, Math.sin(el) * d, Math.cos(el) * d); controls.target.copy(ORIGIN); camera.lookAt(ORIGIN); }
+  return d;
+}
+let baseDist = applyLayout(true);
+
+/* kamera holatlari: intro → overview → flying → focused/greeting → returning → overview */
+let mode = 'intro';
+let introT = 0; const INTRO_DUR = reduceMotion ? 0.01 : 5.2;
+const cam = { active: false, t: 0, dur: 2, fromPos: new V3(), fromTar: new V3(), getPos: null, getTar: null, onDone: null, trigAt: 2, trigFn: null };
+let pendingReturn = false;
+const saved = { pos: new V3(), tar: new V3() };
+const easeIO = x => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+const easeOut = x => 1 - Math.pow(1 - x, 4);
+function flyTo(getPos, getTar, dur, onDone, trigAt, trigFn) {
+  cam.fromPos.copy(camera.position); cam.fromTar.copy(controls.target);
+  cam.getPos = getPos; cam.getTar = getTar; cam.t = 0; cam.dur = reduceMotion ? dur * 0.4 : dur; cam.onDone = onDone; cam.trigAt = trigAt || 2; cam.trigFn = trigFn || null; cam.active = true;
+  controls.enabled = false; controls.autoRotate = false; clearTimeout(autoTimer);
+}
+const _P = new V3(), _D = new V3(), _T = new V3(), _tmpA = new V3(), _tmpB = new V3();
+function planetWorld(p, out) { return p.holder.getWorldPosition(out); }
+function focusCamPos(p, out) {
+  planetWorld(p, _P);
+  _D.set(_P.x, 0, _P.z).normalize();
+  _T.set(-_D.z, 0, _D.x); if (_T.dot(SUN) < 0) _T.negate();
+  const dist = p.d.size * smallScale * 5.6, a = 0.9;
+  out.copy(_P).addScaledVector(_D, Math.cos(a) * dist).addScaledVector(_T, Math.sin(a) * dist);
+  out.y += dist * 0.28; return out;
+}
+
+let timeScale = 1, timeScaleTarget = 1, focusIdx = -1, hoverIdx = -1;
+
+function returnToOverview() {
+  if (mode === 'returning' || mode === 'overview' || mode === 'intro') return;
+  mode = 'returning'; timeScaleTarget = 1; focusIdx = -1;
+  flyTo(() => saved.pos, () => saved.tar, 2.2, () => {
+    mode = 'overview'; controls.enabled = true; controls.update();
+    controls.autoRotate = !reduceMotion; document.body.classList.remove('busy');
+  });
+}
+
+/* ——— suratli sayyora ——— */
+const viewer = $('#photo-viewer'), photoImg = $('#photo-large'), photoCap = $('#photo-cap');
+let photoOpen = false;
+function screenOf(obj) { const v = obj.getWorldPosition(new V3()).project(camera); return { x: (v.x * 0.5 + 0.5) * innerWidth, y: (-v.y * 0.5 + 0.5) * innerHeight }; }
+function focusPlanet(i) {
+  const p = planets[i];
+  saved.pos.copy(camera.position); saved.tar.copy(controls.target);
+  mode = 'flying'; focusIdx = i; timeScaleTarget = 0.05; document.body.classList.add('busy');
+  pendingReturn = false;
+  flyTo(() => focusCamPos(p, _tmpA), () => planetWorld(p, _tmpB), 2.4, () => { mode = 'focused'; if (pendingReturn) { pendingReturn = false; returnToOverview(); } }, 0.72, () => openPhoto(i));
+  const o = planetWorld(p, new V3());
+  burst.fire(o, p.d.atmo, 5 * smallScale, 1.9, 3.4);
+  shock.fire(o, p.d.atmo, 7.5 * smallScale, 1.3);
+}
+function openPhoto(i) {
+  if (focusIdx !== i) return;
+  const sp = screenOf(planets[i].holder);
+  viewer.style.setProperty('--cx', sp.x + 'px'); viewer.style.setProperty('--cy', sp.y + 'px');
+  viewer.style.setProperty('--dx', (sp.x - innerWidth / 2) + 'px'); viewer.style.setProperty('--dy', (sp.y - innerHeight / 2) + 'px');
+  photoCap.textContent = 'Xotira · ' + (i + 1) + ' / ' + PL.length;
+  photoImg.onerror = () => { photoCap.textContent = 'Surat topilmadi: assets/photo-' + (i + 1) + '.jpg'; };
+  photoImg.src = 'assets/photo-' + (i + 1) + '.jpg';
+  const show = () => { if (focusIdx === i) { viewer.classList.add('open'); document.body.classList.add('overlay'); photoOpen = true; } };
+  (photoImg.decode ? photoImg.decode() : Promise.reject()).then(show, show);
+}
+function requestReturn() { if (mode === 'focused' || mode === 'greeting') returnToOverview(); else if (mode === 'flying') pendingReturn = true; }
+function closePhoto() {
+  if (!photoOpen) return;
+  viewer.classList.remove('open'); document.body.classList.remove('overlay'); photoOpen = false;
+  requestReturn();
+}
+$('#photo-close').addEventListener('click', closePhoto);
+viewer.addEventListener('click', e => { if (e.target === viewer || e.target.classList.contains('pv-rays')) closePhoto(); });
+
+/* ——— markaziy sayyora: tabrik ——— */
+const reveal = $('#reveal');
+const sparks = (() => {
+  const c = $('#sparks'), ctx = c.getContext('2d'); let list = [], run = false, last = 0, nextAt = 0, w = 0, h = 0, dpr = 1;
+  const size = () => { dpr = Math.min(devicePixelRatio || 1, 2); w = innerWidth; h = innerHeight; c.width = w * dpr; c.height = h * dpr; };
+  function spawn(x, y, n) {
+    for (let i = 0; i < n && list.length < 420; i++) {
+      const a = Math.random() * Math.PI * 2, v = 1 + Math.random() * 5.2, cool = Math.random() < 0.22;
+      list.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 1.3, life: 1, decay: 0.006 + Math.random() * 0.011, r: 0.8 + Math.random() * 2.2, hue: cool ? 195 : 36 + Math.random() * 18, star: Math.random() < 0.3 });
+    }
+  }
+  function loop(now) {
+    if (!run) return; requestAnimationFrame(loop);
+    const dt = Math.min((now - last) / 16.7, 3); last = now;
+    if (now > nextAt) { spawn(w * (0.15 + Math.random() * 0.7), h * (0.12 + Math.random() * 0.5), 46); nextAt = now + 850 + Math.random() * 700; }
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, w, h); ctx.globalCompositeOperation = 'lighter';
+    for (let i = list.length - 1; i >= 0; i--) {
+      const p = list[i]; p.vy += 0.045 * dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vx *= 0.985; p.life -= p.decay * dt;
+      if (p.life <= 0) { list.splice(i, 1); continue; }
+      const a = Math.max(p.life, 0), col = 'hsla(' + p.hue + ',90%,' + (62 + 25 * a) + '%,' + (a * 0.95) + ')';
+      ctx.fillStyle = col;
+      if (p.star) { const s = p.r * 2.6; ctx.beginPath(); ctx.moveTo(p.x, p.y - s); ctx.lineTo(p.x + s * 0.28, p.y - s * 0.28); ctx.lineTo(p.x + s, p.y); ctx.lineTo(p.x + s * 0.28, p.y + s * 0.28); ctx.lineTo(p.x, p.y + s); ctx.lineTo(p.x - s * 0.28, p.y + s * 0.28); ctx.lineTo(p.x - s, p.y); ctx.lineTo(p.x - s * 0.28, p.y - s * 0.28); ctx.closePath(); ctx.fill(); }
+      else { ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 6.2832); ctx.fill(); }
+    }
+  }
+  return {
+    start() { if (reduceMotion) return; size(); list = []; run = true; last = performance.now(); nextAt = last + 600; requestAnimationFrame(loop); },
+    stop() { run = false; ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, c.width, c.height); },
+    resize: size
+  };
+})();
+let greetOpen = false;
+function openGreeting() {
+  saved.pos.copy(camera.position); saved.tar.copy(controls.target);
+  mode = 'flying'; timeScaleTarget = 0.15; document.body.classList.add('busy');
+  const gd = portrait ? 17 : 13.5;
+  pendingReturn = false;
+  flyTo(() => _tmpA.copy(saved.pos).setLength(gd), () => ORIGIN, 2.2, () => { mode = 'greeting'; if (pendingReturn) { pendingReturn = false; returnToOverview(); } }, 0.66, showGreeting);
+  burst.fire(ORIGIN, 0xffd79a, 15, 3.2, 5);
+  shock.fire(ORIGIN, 0xffe3a8, 34, 1.8);
+}
+function showGreeting() { reveal.classList.add('show'); document.body.classList.add('overlay'); sparks.start(); greetOpen = true; }
+function closeGreeting() {
+  if (!greetOpen) return;
+  greetOpen = false;
+  reveal.classList.remove('show'); document.body.classList.remove('overlay'); sparks.stop();
+  requestReturn();
+}
+$('#close').addEventListener('click', closeGreeting);
+addEventListener('keydown', e => { if (e.key !== 'Escape') return; if (photoOpen) closePhoto(); else if (greetOpen) closeGreeting(); });
+
+/* ——— sichqoncha / barmoq ——— */
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+function pickAt(x, y) {
+  const r = dom.getBoundingClientRect();
+  ndc.set(((x - r.left) / r.width) * 2 - 1, -((y - r.top) / r.height) * 2 + 1);
+  ray.setFromCamera(ndc, camera);
+  const h = ray.intersectObjects(pickables, false);
+  return h.length ? h[0].object.userData : null;
+}
+let down = null; dom.style.cursor = 'grab';
+dom.addEventListener('pointerdown', e => { down = { x: e.clientX, y: e.clientY }; });
+dom.addEventListener('pointerup', e => {
+  if (!down) return; const moved = Math.hypot(e.clientX - down.x, e.clientY - down.y); down = null;
+  if (moved > 9 || mode !== 'overview') return;
+  const hit = pickAt(e.clientX, e.clientY); if (!hit) return;
+  if (hit.kind === 'photo') focusPlanet(hit.index); else if (hit.kind === 'center') openGreeting();
 });
-document.querySelector('#close').addEventListener('click',()=>document.querySelector('#reveal').classList.remove('show'));
-addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.position.z=innerWidth<700?38:30.5;camera.updateProjectionMatrix();renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);});
-if(innerWidth<700){camera.position.z=38;}
+dom.addEventListener('pointermove', e => {
+  if (e.pointerType !== 'mouse' || mode !== 'overview' || down) return;
+  const hit = pickAt(e.clientX, e.clientY);
+  hoverIdx = hit && hit.kind === 'photo' ? hit.index : -1;
+  dom.style.cursor = hit ? 'pointer' : 'grab';
+});
+
+/* ════════════════════ O‘LCHAM O‘ZGARISHI ════════════════════ */
+addEventListener('resize', () => {
+  renderer.setSize(innerWidth, innerHeight); composer.setSize(innerWidth, innerHeight);
+  const now = innerWidth < innerHeight, changed = now !== portrait; portrait = now;
+  baseDist = applyLayout(changed && mode === 'overview');
+  sparks.resize();
+});
+
+/* ════════════════════ ADAPTIV SIFAT: sekin qurilmada avtomatik yengillashadi ════════════════════ */
+const perf = { frames: 0, acc: 0, level: 0, startAt: 0 };
+function degrade() {
+  perf.level++;
+  if (perf.level === 1) { Q.bloom = false; }
+  else if (perf.level === 2) { Q.dpr = 1; renderer.setPixelRatio(1); composer.setPixelRatio(1); composer.setSize(innerWidth, innerHeight); U_PR.value = 1; }
+  else if (perf.level === 3) { nearStars.visible = false; planets.forEach(p => { p.dust.visible = false; }); belt.visible = false; }
+}
+
+/* ════════════════════ ASOSIY SIKL ════════════════════ */
+const clock = new THREE.Clock();
+const dpx = () => renderer.getPixelRatio();
+let T = 0, firstFrame = true;
+function frame() {
+  requestAnimationFrame(frame);
+  const dt = Math.min(clock.getDelta(), 0.05); T += dt; U_TIME.value = T;
+
+  timeScale += (timeScaleTarget - timeScale) * Math.min(1, dt * 2.4);
+  const odt = dt * timeScale;
+
+  central.rotation.y += odt * 0.06;
+  mainRing.rotation.z += odt * 0.01;
+  belt.rotation.y -= odt * 0.02;
+  farStars.rotation.y += dt * 0.0016; nearStars.rotation.y -= dt * 0.004;
+
+  planets.forEach((p, i) => {
+    p.theta += p.speed * odt;
+    p.pivot.rotation.y = p.theta; p.holder.rotation.y = -p.theta;
+    p.mesh.rotation.y += odt * p.spin;
+    p.orbit.material.uniforms.uTheta.value = p.theta;
+    p.dust.rotation.y += odt * 0.03 * (i % 2 ? 1 : -1);
+    const target = (i === hoverIdx ? 0.5 : 0) + (i === focusIdx ? 1 : 0);
+    p.glow += (target - p.glow) * Math.min(1, dt * 4);
+    const u = p.mat.uniforms; u.uGlow.value = p.glow * 0.12; u.uFill.value = p.glow * 0.35;
+    p.shellMat.uniforms.uIntensity.value = 1 + p.glow * 1.1;
+    p.halo.visible = p.glow > 0.02; p.halo.material.opacity = Math.min(p.glow, 1) * 0.3;
+    if (p.ringMesh) p.holder.getWorldPosition(p.ringMesh.material.uniforms.uCenter.value);
+  });
+
+  // orbita chizig‘ining ekrandagi qalinligini doim ~2 piksel qilib ushlaymiz
+  const dist = camera.position.distanceTo(controls.target);
+  ORBIT_CORE.value = THREE.MathUtils.clamp((2 * dist * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))) / (innerHeight * dpx()) * 1.7, 0.012, 0.35);
+
+  // kamera
+  if (mode === 'intro') {
+    introT += dt; const f = Math.min(introT / INTRO_DUR, 1), e = easeOut(f);
+    const rad = THREE.MathUtils.lerp(baseDist * 1.9, baseDist, e), az = THREE.MathUtils.lerp(1.5, 0, e), el = THREE.MathUtils.lerp(0.9, camElev(), e);
+    camera.position.set(Math.sin(az) * Math.cos(el) * rad, Math.sin(el) * rad, Math.cos(az) * Math.cos(el) * rad);
+    controls.target.copy(ORIGIN); camera.lookAt(ORIGIN);
+    if (f >= 1) { mode = 'overview'; controls.enabled = true; controls.update(); }
+    else controls.enabled = false;
+  } else if (cam.active) {
+    cam.t = Math.min(1, cam.t + dt / cam.dur); const e = easeIO(cam.t);
+    camera.position.lerpVectors(cam.fromPos, cam.getPos(), e);
+    controls.target.lerpVectors(cam.fromTar, cam.getTar(), e);
+    camera.lookAt(controls.target);
+    if (cam.trigFn && cam.t >= cam.trigAt) { const fn = cam.trigFn; cam.trigFn = null; fn(); }
+    if (cam.t >= 1) { cam.active = false; if (cam.onDone) cam.onDone(); }
+  } else if (mode === 'focused' && focusIdx >= 0) {
+    const p = planets[focusIdx];
+    focusCamPos(p, camera.position); camera.position.x += Math.sin(T * 0.45) * 0.12; camera.position.y += Math.cos(T * 0.37) * 0.08;
+    planetWorld(p, controls.target); camera.lookAt(controls.target);
+  } else if (mode === 'greeting') {
+    camera.position.applyAxisAngle(Y_AXIS, dt * 0.05); camera.lookAt(ORIGIN);
+  } else if (mode === 'overview') {
+    controls.update();
+  }
+
+  burst.update(dt); shock.update(dt);
+
+  if (Q.bloom) composer.render(dt); else renderer.render(scene, camera);
+
+  if (firstFrame) { firstFrame = false; $('#loader').classList.add('done'); }
+
+  // FPS kuzatuvi (intro tugagach, har ~2 soniyada)
+  if (mode !== 'intro' && perf.level < 3) {
+    perf.frames++; perf.acc += dt;
+    if (perf.acc > 2.2) { const fps = perf.frames / perf.acc; if (fps < 38) degrade(); perf.frames = 0; perf.acc = 0; }
+  }
+}
+frame();
+}
 </script>
 </body>
 </html>
