@@ -138,13 +138,13 @@ const ring2=new THREE.Mesh(new THREE.RingGeometry(6.25,6.42,160),new THREE.MeshB
 
 // Seven clearly visible orbital paths around the central planet.
 const orbitMat=new THREE.LineBasicMaterial({color:0x8bb9ff,transparent:true,opacity:.19});
-for(const r of [9.75,10.45,11.1,11.8,12.25,11.5,10.7]){
+for(const r of [8.25,10.5,12.35,9.15,13.1,11.45,8.85]){
  const pts=[];for(let i=0;i<=240;i++){const a=i/240*Math.PI*2;pts.push(new THREE.Vector3(Math.cos(a)*r,Math.sin(a)*r*.18,Math.sin(a)*r*.72));}
  const line=new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),orbitMat);scene.add(line);
 }
 // Seven small planets orbit the central world; each opens its own photo.
 const photoPlanets=[];
-const orbitRadii=[9.75,10.45,11.1,11.8,12.25,11.5,10.7];
+const orbitRadii=[8.25,10.5,12.35,9.15,13.1,11.45,8.85];
 const planetColors=[0x79a9e8,0xd6a16f,0x9d8bd8,0x6dbbb2,0xd889a6,0xc6b77a,0x7894c8];
 for(let i=0;i<7;i++){
  const pivot=new THREE.Group();pivot.rotation.set(.12+(i%3)*.13,0,(i-3)*.075);scene.add(pivot);
