@@ -35,19 +35,6 @@ h1 span{display:block;color:#f4d9a8;font-style:italic}
 @media(max-width:600px){.ui{padding:22px}.brand{font-size:8px}.status{font-size:8px}.center{top:46%}.sub{max-width:300px}.bottom{align-items:end}.hint{max-width:130px;font-size:8px}.actions{flex-direction:column}.btn{padding:12px 14px;font-size:8px}.actions .btn:first-child{display:none}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 
-#memory-orbit{position:fixed;inset:0;z-index:6;pointer-events:none;display:block}
-.memory-photo{position:absolute;left:50%;top:50%;width:clamp(68px,10vw,112px);height:clamp(86px,13vw,140px);padding:5px;border:1px solid #f1d19a99;border-radius:6px;background:linear-gradient(145deg,#202944,#080d1d);box-shadow:0 8px 32px #000b,0 0 22px #b6c8ff35;transform:translate(-50%,-50%) scale(.02);opacity:0;visibility:hidden;pointer-events:none;cursor:pointer;transition:transform .9s cubic-bezier(.2,.8,.2,1),opacity .55s,visibility .55s}
-#memory-orbit.unlocked{pointer-events:none}
-#memory-orbit.unlocked .memory-photo{transform:translate(-50%,-50%) rotate(var(--a)) translateY(clamp(-310px,-34vh,-185px)) rotate(calc(var(--a)*-1));opacity:1;visibility:visible;pointer-events:auto}
-.memory-photo img{width:100%;height:100%;object-fit:cover;border-radius:3px;display:block;filter:saturate(.9) contrast(1.04)}
-.memory-photo span{position:absolute;right:-6px;top:-8px;color:#f5d49a;text-shadow:0 0 12px #f5d49a;font-size:13px}
-#photo-viewer{position:fixed;inset:0;z-index:12;background:#030511ed;backdrop-filter:blur(18px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;opacity:0;visibility:hidden;transition:.35s}
-#photo-viewer.open{opacity:1;visibility:visible}
-#photo-large{max-width:min(82vw,520px);max-height:76vh;object-fit:contain;border:1px solid #f5d49a88;box-shadow:0 15px 70px #000}
-#photo-viewer p{font-size:9px;letter-spacing:.32em;color:#e8d09f;margin-top:18px}
-#photo-close{position:absolute;right:22px;top:18px;border:1px solid #ffffff55;background:#11182b;color:white;border-radius:50%;width:42px;height:42px;font-size:28px;cursor:pointer}
-@media(max-width:600px){.memory-photo{width:clamp(55px,15vw,78px);height:clamp(70px,20vw,100px);padding:3px}#memory-orbit.unlocked .memory-photo{transform:translate(-50%,-50%) rotate(var(--a)) translateY(clamp(-250px,-31vh,-155px)) rotate(calc(var(--a)*-1))}}
-
 </style>
 </head>
 <body>
@@ -62,15 +49,6 @@ window.setTimeout(()=>{
 },15000);
 </script>
 
-<div id="memory-orbit" aria-label="Maxliyoning suratlari">
- <button class="memory-photo" type="button" data-photo="1" aria-label="1-suratni kattalashtirish" style="--a:0deg"><img src="assets/photo-1.jpg" alt="Maxliyoning xotirasi 1" loading="lazy"><span>✦</span></button>
- <button class="memory-photo" type="button" data-photo="2" aria-label="2-suratni kattalashtirish" style="--a:45deg"><img src="assets/photo-2.jpg" alt="Maxliyoning xotirasi 2" loading="lazy"><span>✦</span></button>
- <button class="memory-photo" type="button" data-photo="3" aria-label="3-suratni kattalashtirish" style="--a:90deg"><img src="assets/photo-3.jpg" alt="Maxliyoning xotirasi 3" loading="lazy"><span>✦</span></button>
- <button class="memory-photo" type="button" data-photo="4" aria-label="4-suratni kattalashtirish" style="--a:135deg"><img src="assets/photo-4.jpg" alt="Maxliyoning xotirasi 4" loading="lazy"><span>✦</span></button>
- <button class="memory-photo" type="button" data-photo="5" aria-label="5-suratni kattalashtirish" style="--a:180deg"><img src="assets/photo-5.jpg" alt="Maxliyoning xotirasi 5" loading="lazy"><span>✦</span></button>
- <button class="memory-photo" type="button" data-photo="6" aria-label="6-suratni kattalashtirish" style="--a:225deg"><img src="assets/photo-6.jpg" alt="Maxliyoning xotirasi 6" loading="lazy"><span>✦</span></button>
- <button class="memory-photo" type="button" data-photo="7" aria-label="7-suratni kattalashtirish" style="--a:270deg"><img src="assets/photo-7.jpg" alt="Maxliyoning xotirasi 7" loading="lazy"><span>✦</span></button>
-</div>
 <div id="photo-viewer" role="dialog" aria-modal="true" aria-label="Suratni ko‘rish"><button id="photo-close" aria-label="Yopish">×</button><img id="photo-large" alt="Maxliyo surati"><p>MAXLIYONING XOTIRASI</p></div>
 <div class="vignette"></div><div class="grain"></div>
 <div id="loader"><div class="loader-inner"><div class="loader-mark"></div><div class="loader-text">Koinot tayyorlanmoqda</div></div></div>
@@ -105,13 +83,6 @@ document.querySelector('.reveal-kicker').textContent = '✦  SENGA ATALGAN KICHI
 document.querySelector('#message').textContent = CONFIG.message;
 
 
-document.querySelectorAll('.memory-photo').forEach(button=>{
- button.addEventListener('click',()=>{
-  const src=button.querySelector('img').getAttribute('src');
-  document.querySelector('#photo-large').src=src;
-  document.querySelector('#photo-viewer').classList.add('open');
- });
-});
 function closePhoto(){document.querySelector('#photo-viewer').classList.remove('open');}
 document.querySelector('#photo-close').addEventListener('click',closePhoto);
 document.querySelector('#photo-viewer').addEventListener('click',e=>{if(e.target.id==='photo-viewer')closePhoto();});
@@ -165,8 +136,20 @@ const ring2=new THREE.Mesh(new THREE.RingGeometry(6.25,6.42,160),new THREE.MeshB
 // Fine orbit lines and three small moons.
 const orbitMat=new THREE.LineBasicMaterial({color:0x8bb9ff,transparent:true,opacity:.22});
 for(const r of [8.2,10.8,13.7]){const pts=[];for(let i=0;i<=240;i++){const a=i/240*Math.PI*2;pts.push(new THREE.Vector3(Math.cos(a)*r,Math.sin(a)*r*.24,Math.sin(a)*r*.72));}const line=new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),orbitMat);scene.add(line);}
-const moons=[];
-for(let i=0;i<3;i++){const pivot=new THREE.Group();scene.add(pivot);const r=8.2+i*2.7;pivot.rotation.z=i*2.1;pivot.rotation.x=.15+i*.17;const moon=new THREE.Mesh(new THREE.SphereGeometry(i===1?.42:.27,32,24),new THREE.MeshStandardMaterial({color:[0xb9c5e9,0xe4c9a4,0x8fa8d8][i],roughness:.72,metalness:.18,emissive:[0x17274a,0x3b2415,0x14233d][i],emissiveIntensity:.28}));moon.position.set(r,0,0);pivot.add(moon);moons.push(pivot);}
+// Seven small planets orbit the central world; each opens its own photo.
+const photoPlanets=[];
+const orbitRadii=[7.35,8.15,9.15,10.05,9.55,8.65,7.8];
+const planetColors=[0x79a9e8,0xd6a16f,0x9d8bd8,0x6dbbb2,0xd889a6,0xc6b77a,0x7894c8];
+for(let i=0;i<7;i++){
+ const pivot=new THREE.Group();pivot.rotation.set(.12+(i%3)*.13,0,(i-3)*.075);scene.add(pivot);
+ const radius=orbitRadii[i];
+ const sphere=new THREE.Mesh(new THREE.SphereGeometry(.43+(i%3)*.045,40,32),new THREE.MeshStandardMaterial({color:planetColors[i],roughness:.68,metalness:.22,emissive:planetColors[i],emissiveIntensity:.12}));
+ sphere.position.set(radius,0,0);sphere.userData.photoIndex=i+1;pivot.add(sphere);
+ const glow=new THREE.Mesh(new THREE.SphereGeometry(.51+(i%3)*.045,32,24),new THREE.MeshBasicMaterial({color:planetColors[i],transparent:true,opacity:.10,side:THREE.BackSide,blending:THREE.AdditiveBlending}));
+ glow.position.copy(sphere.position);pivot.add(glow);
+ if(i===1||i===4){const miniRing=new THREE.Mesh(new THREE.RingGeometry(.57,.78,64),new THREE.MeshBasicMaterial({color:0xe8d3b0,transparent:true,opacity:.42,side:THREE.DoubleSide,depthWrite:false}));miniRing.position.copy(sphere.position);miniRing.rotation.set(1.1,.2,.25);pivot.add(miniRing);}
+ pivot.userData.speed=(i%2===0?1:-1)*(.045+i*.006);pivot.userData.phase=i*Math.PI*2/7;pivot.rotation.y=pivot.userData.phase;photoPlanets.push({pivot,sphere});
+}
 
 // A trail of tiny luminous particles around the main body.
 const dustCount=2600,dustPos=new Float32Array(dustCount*3);for(let i=0;i<dustCount;i++){const a=Math.random()*Math.PI*2,r=4.3+Math.random()*3.4;dustPos[i*3]=Math.cos(a)*r;dustPos[i*3+1]=(Math.random()-.5)*.42;dustPos[i*3+2]=Math.sin(a)*r;}
@@ -176,7 +159,7 @@ const dustGeo=new THREE.BufferGeometry();dustGeo.setAttribute('position',new THR
 const sparkle=starField(500,24,.08,.75);
 
 const clock=new THREE.Clock();let revealMode=false;
-function animate(){requestAnimationFrame(animate);const t=clock.getElapsedTime();planet.rotation.y=t*.035;planetGroup.rotation.y=Math.sin(t*.08)*.08;ring.rotation.z+=.00045;dust.rotation.y=-t*.012;starsFar.rotation.y=t*.0018;starsNear.rotation.y=-t*.003;sparkle.rotation.y=t*.004;moons.forEach((m,i)=>m.rotation.y=t*(.055+i*.018));controls.update();renderer.render(scene,camera);}
+function animate(){requestAnimationFrame(animate);const t=clock.getElapsedTime();planet.rotation.y=t*.035;planetGroup.rotation.y=Math.sin(t*.08)*.08;ring.rotation.z+=.00045;dust.rotation.y=-t*.012;starsFar.rotation.y=t*.0018;starsNear.rotation.y=-t*.003;sparkle.rotation.y=t*.004;photoPlanets.forEach(({pivot,sphere})=>{pivot.rotation.y=pivot.userData.phase+t*pivot.userData.speed;sphere.rotation.y=t*.18;});controls.update();renderer.render(scene,camera);}
 animate();
 const loader=document.querySelector('#loader');setTimeout(()=>loader.classList.add('done'),650);
 // Tabrik faqat markazdagi katta sayyora bosilganda ochiladi.
@@ -190,18 +173,21 @@ renderer.domElement.addEventListener('pointerup',e=>{
  pointer.x=((e.clientX-rect.left)/rect.width)*2-1;
  pointer.y=-((e.clientY-rect.top)/rect.height)*2+1;
  raycaster.setFromCamera(pointer,camera);
- if(raycaster.intersectObject(planet,true).length){
-  const gallery=document.querySelector('#memory-orbit');
-  if(!gallery.classList.contains('unlocked')) gallery.classList.add('unlocked');
-  else document.querySelector('#reveal').classList.add('show');
+ const photoHit=raycaster.intersectObjects(photoPlanets.map(p=>p.sphere),false)[0];
+ if(photoHit){
+  const index=photoHit.object.userData.photoIndex;
+  document.querySelector('#photo-large').src='assets/photo-'+index+'.jpg';
+  document.querySelector('#photo-viewer').classList.add('open');
+  return;
  }
+ if(raycaster.intersectObject(planet,true).length)document.querySelector('#reveal').classList.add('show');
 });
 renderer.domElement.addEventListener('pointermove',e=>{
  const rect=renderer.domElement.getBoundingClientRect();
  pointer.x=((e.clientX-rect.left)/rect.width)*2-1;
  pointer.y=-((e.clientY-rect.top)/rect.height)*2+1;
  raycaster.setFromCamera(pointer,camera);
- renderer.domElement.style.cursor=raycaster.intersectObject(planet,true).length?'pointer':'grab';
+ renderer.domElement.style.cursor=(raycaster.intersectObject(planet,true).length||raycaster.intersectObjects(photoPlanets.map(p=>p.sphere),false).length)?'pointer':'grab';
 });
 document.querySelector('#close').addEventListener('click',()=>document.querySelector('#reveal').classList.remove('show'));
 addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);});
