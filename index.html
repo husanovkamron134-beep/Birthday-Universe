@@ -52,6 +52,16 @@ h1 span{display:block;color:#f4d9a8;font-style:italic}
 </head>
 <body>
 <div id="stage"></div>
+<script>
+window.setTimeout(()=>{
+ const loader=document.getElementById('loader');
+ if(loader && !loader.classList.contains('done')){
+  loader.classList.add('done');
+  document.getElementById('stage').innerHTML='<div style="height:100%;display:grid;place-items:center;padding:28px;text-align:center;color:#f5d49a;font:14px system-ui">Koinot yuklanmadi. Internet aloqasini tekshirib, sahifani yangilang.</div>';
+ }
+},15000);
+</script>
+
 <div id="memory-orbit" aria-label="Maxliyoning suratlari">
  <button class="memory-photo" type="button" data-photo="1" aria-label="1-suratni kattalashtirish" style="--a:0deg"><img src="assets/photo-1.jpg" alt="Maxliyoning xotirasi 1" loading="lazy"><span>✦</span></button>
  <button class="memory-photo" type="button" data-photo="2" aria-label="2-suratni kattalashtirish" style="--a:45deg"><img src="assets/photo-2.jpg" alt="Maxliyoning xotirasi 2" loading="lazy"><span>✦</span></button>
@@ -91,7 +101,8 @@ const CONFIG = {
   revealTitle: 'Yulduzlardan senga xabar'
 };
 document.querySelector('#signature').textContent = CONFIG.sender;
-document.querySelector('.reveal-title').innerHTML = 'Maxliyo, tug‘ilgan kuning<br><em>muborak!</em>';\ndocument.querySelector('.reveal-kicker').textContent = '✦  SENGA ATALGAN KICHIK KOINOT  ✦';
+document.querySelector('.reveal-title').innerHTML = 'Maxliyo, tug‘ilgan kuning<br><em>muborak!</em>';
+document.querySelector('.reveal-kicker').textContent = '✦  SENGA ATALGAN KICHIK KOINOT  ✦';
 document.querySelector('#message').textContent = CONFIG.message;
 
 
