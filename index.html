@@ -92,10 +92,10 @@ document.querySelector('#photo-viewer').addEventListener('click',e=>{if(e.target
 
 const host=document.querySelector('#stage');
 const scene=new THREE.Scene(); scene.background=new THREE.Color(0x050713); scene.fog=new THREE.FogExp2(0x050713,.012);
-const camera=new THREE.PerspectiveCamera(48,innerWidth/innerHeight,.1,900);camera.position.set(0,7.8,27.5);
+const camera=new THREE.PerspectiveCamera(48,innerWidth/innerHeight,.1,900);camera.position.set(0,7.8,30.5);
 const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.22;host.appendChild(renderer.domElement);
-const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.dampingFactor=.045;controls.minDistance=10;controls.maxDistance=42;controls.enablePan=false;controls.maxPolarAngle=Math.PI*.82;controls.target.set(0,0,0);
+const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.dampingFactor=.045;controls.minDistance=10;controls.maxDistance=48;controls.enablePan=false;controls.maxPolarAngle=Math.PI*.82;controls.target.set(0,0,0);
 
 // Lighting: a warm key light and cool atmospheric fill.
 scene.add(new THREE.AmbientLight(0x7184bd,.42));
@@ -138,13 +138,13 @@ const ring2=new THREE.Mesh(new THREE.RingGeometry(6.25,6.42,160),new THREE.MeshB
 
 // Seven clearly visible orbital paths around the central planet.
 const orbitMat=new THREE.LineBasicMaterial({color:0x8bb9ff,transparent:true,opacity:.19});
-for(const r of [7.8,8.35,8.9,9.45,9.8,9.2,8.55]){
+for(const r of [9.75,10.45,11.1,11.8,12.25,11.5,10.7]){
  const pts=[];for(let i=0;i<=240;i++){const a=i/240*Math.PI*2;pts.push(new THREE.Vector3(Math.cos(a)*r,Math.sin(a)*r*.18,Math.sin(a)*r*.72));}
  const line=new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),orbitMat);scene.add(line);
 }
 // Seven small planets orbit the central world; each opens its own photo.
 const photoPlanets=[];
-const orbitRadii=[7.8,8.35,8.9,9.45,9.8,9.2,8.55];
+const orbitRadii=[9.75,10.45,11.1,11.8,12.25,11.5,10.7];
 const planetColors=[0x79a9e8,0xd6a16f,0x9d8bd8,0x6dbbb2,0xd889a6,0xc6b77a,0x7894c8];
 for(let i=0;i<7;i++){
  const pivot=new THREE.Group();pivot.rotation.set(.12+(i%3)*.13,0,(i-3)*.075);scene.add(pivot);
@@ -201,8 +201,8 @@ renderer.domElement.addEventListener('pointermove',e=>{
  renderer.domElement.style.cursor=(raycaster.intersectObject(planet,true).length||raycaster.intersectObjects(photoPlanets.map(p=>p.pivot),true).some(hit=>Number.isInteger(hit.object.userData.photoIndex)))?'pointer':'grab';
 });
 document.querySelector('#close').addEventListener('click',()=>document.querySelector('#reveal').classList.remove('show'));
-addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.position.z=innerWidth<700?34:27.5;camera.updateProjectionMatrix();renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);});
-if(innerWidth<700){camera.position.z=34;}
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.position.z=innerWidth<700?38:30.5;camera.updateProjectionMatrix();renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);});
+if(innerWidth<700){camera.position.z=38;}
 </script>
 </body>
 </html>
