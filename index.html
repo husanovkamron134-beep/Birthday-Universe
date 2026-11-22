@@ -35,18 +35,18 @@ h1 span{display:block;color:#f4d9a8;font-style:italic}
 @media(max-width:600px){.ui{padding:22px}.brand{font-size:8px}.status{font-size:8px}.center{top:46%}.sub{max-width:300px}.bottom{align-items:end}.hint{max-width:130px;font-size:8px}.actions{flex-direction:column}.btn{padding:12px 14px;font-size:8px}.actions .btn:first-child{display:none}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 
-#memory-orbit{position:fixed;inset:0;z-index:4;pointer-events:none;display:block}
-.memory-photo{position:absolute;left:50%;top:50%;width:clamp(68px,11vw,116px);height:clamp(88px,14vw,148px);padding:5px;border:1px solid #f1d19a88;border-radius:5px;background:linear-gradient(145deg,#202944,#080d1d);box-shadow:0 8px 32px #0009,0 0 20px #b6c8ff22;transform:translate(-50%,-50%) rotate(var(--a)) translateY(clamp(-340px,-39vh,-205px)) rotate(calc(var(--a)*-1));pointer-events:auto;cursor:pointer;animation:photoFloat 5s ease-in-out infinite;animation-delay:calc(var(--a)/-45*-.35s)}
-.memory-photo:nth-child(even){animation-delay:-2.4s}
-.memory-photo img{width:100%;height:100%;object-fit:cover;border-radius:2px;display:block;filter:saturate(.82) contrast(1.04)}
+#memory-orbit{position:fixed;inset:0;z-index:6;pointer-events:none;display:block}
+.memory-photo{position:absolute;left:50%;top:50%;width:clamp(68px,10vw,112px);height:clamp(86px,13vw,140px);padding:5px;border:1px solid #f1d19a99;border-radius:6px;background:linear-gradient(145deg,#202944,#080d1d);box-shadow:0 8px 32px #000b,0 0 22px #b6c8ff35;transform:translate(-50%,-50%) scale(.02);opacity:0;visibility:hidden;pointer-events:none;cursor:pointer;transition:transform .9s cubic-bezier(.2,.8,.2,1),opacity .55s,visibility .55s}
+#memory-orbit.unlocked{pointer-events:none}
+#memory-orbit.unlocked .memory-photo{transform:translate(-50%,-50%) rotate(var(--a)) translateY(clamp(-310px,-34vh,-185px)) rotate(calc(var(--a)*-1));opacity:1;visibility:visible;pointer-events:auto}
+.memory-photo img{width:100%;height:100%;object-fit:cover;border-radius:3px;display:block;filter:saturate(.9) contrast(1.04)}
 .memory-photo span{position:absolute;right:-6px;top:-8px;color:#f5d49a;text-shadow:0 0 12px #f5d49a;font-size:13px}
-@keyframes photoFloat{0%,100%{margin-top:0}50%{margin-top:-9px}}
 #photo-viewer{position:fixed;inset:0;z-index:12;background:#030511ed;backdrop-filter:blur(18px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;opacity:0;visibility:hidden;transition:.35s}
 #photo-viewer.open{opacity:1;visibility:visible}
 #photo-large{max-width:min(82vw,520px);max-height:76vh;object-fit:contain;border:1px solid #f5d49a88;box-shadow:0 15px 70px #000}
 #photo-viewer p{font-size:9px;letter-spacing:.32em;color:#e8d09f;margin-top:18px}
 #photo-close{position:absolute;right:22px;top:18px;border:1px solid #ffffff55;background:#11182b;color:white;border-radius:50%;width:42px;height:42px;font-size:28px;cursor:pointer}
-@media(max-width:600px){.memory-photo{width:clamp(55px,16vw,78px);height:clamp(72px,21vw,102px);transform:translate(-50%,-50%) rotate(var(--a)) translateY(clamp(-285px,-34vh,-175px)) rotate(calc(var(--a)*-1));padding:3px}#memory-orbit{pointer-events:none}.memory-photo{pointer-events:auto}}
+@media(max-width:600px){.memory-photo{width:clamp(55px,15vw,78px);height:clamp(70px,20vw,100px);padding:3px}#memory-orbit.unlocked .memory-photo{transform:translate(-50%,-50%) rotate(var(--a)) translateY(clamp(-250px,-31vh,-155px)) rotate(calc(var(--a)*-1))}}
 
 </style>
 </head>
@@ -190,7 +190,11 @@ renderer.domElement.addEventListener('pointerup',e=>{
  pointer.x=((e.clientX-rect.left)/rect.width)*2-1;
  pointer.y=-((e.clientY-rect.top)/rect.height)*2+1;
  raycaster.setFromCamera(pointer,camera);
- if(raycaster.intersectObject(planet,true).length)document.querySelector('#reveal').classList.add('show');
+ if(raycaster.intersectObject(planet,true).length){
+  const gallery=document.querySelector('#memory-orbit');
+  if(!gallery.classList.contains('unlocked')) gallery.classList.add('unlocked');
+  else document.querySelector('#reveal').classList.add('show');
+ }
 });
 renderer.domElement.addEventListener('pointermove',e=>{
  const rect=renderer.domElement.getBoundingClientRect();
