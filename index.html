@@ -89,7 +89,7 @@ document.querySelector('#photo-viewer').addEventListener('click',e=>{if(e.target
 
 const host=document.querySelector('#stage');
 const scene=new THREE.Scene(); scene.background=new THREE.Color(0x050713); scene.fog=new THREE.FogExp2(0x050713,.012);
-const camera=new THREE.PerspectiveCamera(48,innerWidth/innerHeight,.1,900);camera.position.set(0,5.5,19);
+const camera=new THREE.PerspectiveCamera(48,innerWidth/innerHeight,.1,900);camera.position.set(0,7.2,24);
 const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.22;host.appendChild(renderer.domElement);
 const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.dampingFactor=.045;controls.minDistance=8;controls.maxDistance=36;controls.enablePan=false;controls.maxPolarAngle=Math.PI*.82;controls.target.set(0,0,0);
@@ -133,22 +133,25 @@ const halo=new THREE.Mesh(new THREE.SphereGeometry(3.72,96,72),new THREE.MeshBas
 const ring=new THREE.Mesh(new THREE.RingGeometry(4.35,6.15,160),new THREE.MeshBasicMaterial({color:0xc8a8e9,transparent:true,opacity:.35,side:THREE.DoubleSide,depthWrite:false}));ring.rotation.set(1.18,.18,.22);planetGroup.add(ring);
 const ring2=new THREE.Mesh(new THREE.RingGeometry(6.25,6.42,160),new THREE.MeshBasicMaterial({color:0x8ac9ff,transparent:true,opacity:.16,side:THREE.DoubleSide,depthWrite:false}));ring2.rotation.copy(ring.rotation);planetGroup.add(ring2);
 
-// Fine orbit lines and three small moons.
-const orbitMat=new THREE.LineBasicMaterial({color:0x8bb9ff,transparent:true,opacity:.22});
-for(const r of [8.2,10.8,13.7]){const pts=[];for(let i=0;i<=240;i++){const a=i/240*Math.PI*2;pts.push(new THREE.Vector3(Math.cos(a)*r,Math.sin(a)*r*.24,Math.sin(a)*r*.72));}const line=new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),orbitMat);scene.add(line);}
+// Seven clearly visible orbital paths around the central planet.
+const orbitMat=new THREE.LineBasicMaterial({color:0x8bb9ff,transparent:true,opacity:.19});
+for(const r of [5.25,5.85,6.45,7.05,7.35,6.75,5.95]){
+ const pts=[];for(let i=0;i<=240;i++){const a=i/240*Math.PI*2;pts.push(new THREE.Vector3(Math.cos(a)*r,Math.sin(a)*r*.18,Math.sin(a)*r*.72));}
+ const line=new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),orbitMat);scene.add(line);
+}
 // Seven small planets orbit the central world; each opens its own photo.
 const photoPlanets=[];
-const orbitRadii=[7.35,8.15,9.15,10.05,9.55,8.65,7.8];
+const orbitRadii=[5.25,5.85,6.45,7.05,7.35,6.75,5.95];
 const planetColors=[0x79a9e8,0xd6a16f,0x9d8bd8,0x6dbbb2,0xd889a6,0xc6b77a,0x7894c8];
 for(let i=0;i<7;i++){
  const pivot=new THREE.Group();pivot.rotation.set(.12+(i%3)*.13,0,(i-3)*.075);scene.add(pivot);
  const radius=orbitRadii[i];
- const sphere=new THREE.Mesh(new THREE.SphereGeometry(.43+(i%3)*.045,40,32),new THREE.MeshStandardMaterial({color:planetColors[i],roughness:.68,metalness:.22,emissive:planetColors[i],emissiveIntensity:.12}));
+ const sphere=new THREE.Mesh(new THREE.SphereGeometry(.62+(i%3)*.055,48,36),new THREE.MeshStandardMaterial({color:planetColors[i],roughness:.68,metalness:.22,emissive:planetColors[i],emissiveIntensity:.12}));
  sphere.position.set(radius,0,0);sphere.userData.photoIndex=i+1;pivot.add(sphere);
- const glow=new THREE.Mesh(new THREE.SphereGeometry(.51+(i%3)*.045,32,24),new THREE.MeshBasicMaterial({color:planetColors[i],transparent:true,opacity:.10,side:THREE.BackSide,blending:THREE.AdditiveBlending}));
+ const glow=new THREE.Mesh(new THREE.SphereGeometry(.74+(i%3)*.055,40,32),new THREE.MeshBasicMaterial({color:planetColors[i],transparent:true,opacity:.10,side:THREE.BackSide,blending:THREE.AdditiveBlending}));
  glow.position.copy(sphere.position);pivot.add(glow);
- if(i===1||i===4){const miniRing=new THREE.Mesh(new THREE.RingGeometry(.57,.78,64),new THREE.MeshBasicMaterial({color:0xe8d3b0,transparent:true,opacity:.42,side:THREE.DoubleSide,depthWrite:false}));miniRing.position.copy(sphere.position);miniRing.rotation.set(1.1,.2,.25);pivot.add(miniRing);}
- pivot.userData.speed=(i%2===0?1:-1)*(.045+i*.006);pivot.userData.phase=i*Math.PI*2/7;pivot.rotation.y=pivot.userData.phase;photoPlanets.push({pivot,sphere});
+ if(i===1||i===4){const miniRing=new THREE.Mesh(new THREE.RingGeometry(.82,1.08,72),new THREE.MeshBasicMaterial({color:0xe8d3b0,transparent:true,opacity:.42,side:THREE.DoubleSide,depthWrite:false}));miniRing.position.copy(sphere.position);miniRing.rotation.set(1.1,.2,.25);pivot.add(miniRing);}
+ pivot.userData.speed=(i%2===0?1:-1)*(.065+i*.008);pivot.userData.phase=i*Math.PI*2/7;pivot.rotation.y=pivot.userData.phase;photoPlanets.push({pivot,sphere});
 }
 
 // A trail of tiny luminous particles around the main body.
