@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#050713">
-<title>Birthday Universe — A universe made for you</title>
+<title>Tug‘ilgan kun koinoti</title>
 <style>
 :root{--ink:#f5f4ff;--muted:#a8acc7;--gold:#f5d49a;--cyan:#8ee8ff;--bg:#050713}
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
@@ -12,7 +12,7 @@
 .vignette{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 48%,transparent 28%,rgba(2,4,15,.24) 65%,rgba(2,3,10,.88) 100%);z-index:2}
 .grain{position:fixed;inset:-50%;z-index:3;pointer-events:none;opacity:.055;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");animation:grain .3s steps(2) infinite}
 @keyframes grain{0%{transform:translate(0,0)}25%{transform:translate(2%,-1%)}50%{transform:translate(-1%,2%)}75%{transform:translate(1%,1%)}100%{transform:translate(-2%,-1%)}}
-.ui{position:fixed;inset:0;z-index:5;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(22px,4vw,54px);pointer-events:none}
+.ui{display:none}
 .top{display:flex;justify-content:space-between;align-items:center;gap:16px}.brand{font-size:10px;letter-spacing:.34em;text-transform:uppercase;color:#c5c8df}.status{font-size:10px;letter-spacing:.2em;color:#9fa7c7;display:flex;align-items:center;gap:9px}.dot{width:6px;height:6px;border-radius:50%;background:#9de8f5;box-shadow:0 0 14px #8ee8ff}
 .center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(780px,90vw);text-align:center;pointer-events:none;transition:opacity 1s,transform 1.2s}
 .eyebrow{font-size:10px;letter-spacing:.42em;text-transform:uppercase;color:var(--gold);margin-bottom:22px;text-shadow:0 0 20px #e6c68b55}
@@ -38,14 +38,20 @@ h1 span{display:block;color:#f4d9a8;font-style:italic}
 </head>
 <body>
 <div id="stage"></div><div class="vignette"></div><div class="grain"></div>
-<div id="loader"><div class="loader-inner"><div class="loader-mark"></div><div class="loader-text">Tayyorlanmoqda · your universe awaits</div></div></div>
-<div class="ui" id="interface">
- <div class="top"><div class="brand">✦ &nbsp; A PERSONAL COSMOS</div><div class="status"><i class="dot"></i> ONE UNIVERSE · ONE MOMENT</div></div>
- <div class="center" id="intro"><div class="eyebrow">A little universe, just for you</div><h1>Some stars are <span>meant to shine.</span></h1><p class="sub">Bugun osmon odatdagidan boshqacha. Chunki bu galaktikada bitta alohida inson uchun yaratilgan kichik sir bor.</p></div>
- <div class="bottom"><div class="hint">MOVE TO EXPLORE<br><b>DRAG · ZOOM · DISCOVER</b></div><div class="actions"><button class="btn" id="reset">Recenter view</button><button class="btn primary" id="open">Open your universe&nbsp; ✦</button></div></div>
+<div id="loader"><div class="loader-inner"><div class="loader-mark"></div><div class="loader-text">Koinot tayyorlanmoqda</div></div></div>
+<div class="ui" id="interface" aria-hidden="true"></div>
+
+<div id="reveal" role="dialog" aria-modal="true" aria-label="Tug‘ilgan kun tabrigi">
+ <div class="reveal-card">
+  <div class="reveal-kicker">✦ &nbsp; YULDUZLARDAN SENGA XABAR &nbsp; ✦</div>
+  <h2 class="reveal-title">Tug‘ilgan kuning<br><em>muborak!</em></h2>
+  <p class="reveal-message" id="message">Yangi yoshing quvonchli lahzalar, katta orzular va unutilmas xotiralarga boy bo‘lsin.
+Har doim o‘z nuring bilan porla — bu koinotda sening o‘rning alohida.</p>
+  <div class="reveal-sign" id="signature">Eng ezgu tilaklar bilan</div>
+  <button class="btn close" id="close">Koinotga qaytish</button>
+ </div>
 </div>
-<div id="reveal"><div class="reveal-card"><div class="reveal-kicker">✦ &nbsp; a message from the stars &nbsp; ✦</div><h2 class="reveal-title">Happy Birthday,<br><em id="recipient">dear friend</em></h2><p class="reveal-message" id="message">Yangi yoshing quvonchli lahzalar, katta orzular va unutilmas xotiralarga boy bo‘lsin.
-Har doim o‘z nuring bilan porla — bu koinotda sening o‘rning alohida.</p><div class="reveal-sign" id="signature">With warm wishes</div><button class="btn close" id="close">Return to the stars</button></div></div>
+
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
@@ -53,12 +59,11 @@ import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/exampl
 
 // Personalize these four values before sharing the surprise.
 const CONFIG = {
-  recipient: 'dear friend',
-  sender: 'With warm wishes',
+  recipient: '',
+  sender: 'Eng ezgu tilaklar bilan',
   message: 'Yangi yoshing quvonchli lahzalar, katta orzular va unutilmas xotiralarga boy bo‘lsin.\nHar doim o‘z nuring bilan porla — bu koinotda sening o‘rning alohida.',
-  revealTitle: 'A message from the stars'
+  revealTitle: 'Yulduzlardan senga xabar'
 };
-document.querySelector('#recipient').textContent = CONFIG.recipient;
 document.querySelector('#signature').textContent = CONFIG.sender;
 document.querySelector('#message').textContent = CONFIG.message;
 
@@ -125,9 +130,27 @@ const clock=new THREE.Clock();let revealMode=false;
 function animate(){requestAnimationFrame(animate);const t=clock.getElapsedTime();planet.rotation.y=t*.035;planetGroup.rotation.y=Math.sin(t*.08)*.08;ring.rotation.z+=.00045;dust.rotation.y=-t*.012;starsFar.rotation.y=t*.0018;starsNear.rotation.y=-t*.003;sparkle.rotation.y=t*.004;moons.forEach((m,i)=>m.rotation.y=t*(.055+i*.018));controls.update();renderer.render(scene,camera);}
 animate();
 const loader=document.querySelector('#loader');setTimeout(()=>loader.classList.add('done'),650);
-document.querySelector('#reset').addEventListener('click',()=>{controls.target.set(0,0,0);camera.position.set(0,5.5,19);controls.update();});
-document.querySelector('#open').addEventListener('click',()=>{document.querySelector('#intro').classList.add('hidden');document.querySelector('#reveal').classList.add('show');});
-document.querySelector('#close').addEventListener('click',()=>{document.querySelector('#reveal').classList.remove('show');document.querySelector('#intro').classList.remove('hidden');});
+// Tabrik faqat markazdagi katta sayyora bosilganda ochiladi.
+const raycaster=new THREE.Raycaster(), pointer=new THREE.Vector2();
+let downX=0,downY=0;
+renderer.domElement.style.cursor='grab';
+renderer.domElement.addEventListener('pointerdown',e=>{downX=e.clientX;downY=e.clientY;});
+renderer.domElement.addEventListener('pointerup',e=>{
+ if(Math.hypot(e.clientX-downX,e.clientY-downY)>9)return;
+ const rect=renderer.domElement.getBoundingClientRect();
+ pointer.x=((e.clientX-rect.left)/rect.width)*2-1;
+ pointer.y=-((e.clientY-rect.top)/rect.height)*2+1;
+ raycaster.setFromCamera(pointer,camera);
+ if(raycaster.intersectObject(planet,true).length)document.querySelector('#reveal').classList.add('show');
+});
+renderer.domElement.addEventListener('pointermove',e=>{
+ const rect=renderer.domElement.getBoundingClientRect();
+ pointer.x=((e.clientX-rect.left)/rect.width)*2-1;
+ pointer.y=-((e.clientY-rect.top)/rect.height)*2+1;
+ raycaster.setFromCamera(pointer,camera);
+ renderer.domElement.style.cursor=raycaster.intersectObject(planet,true).length?'pointer':'grab';
+});
+document.querySelector('#close').addEventListener('click',()=>document.querySelector('#reveal').classList.remove('show'));
 addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);});
 </script>
 </body>
