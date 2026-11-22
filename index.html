@@ -34,10 +34,36 @@ h1 span{display:block;color:#f4d9a8;font-style:italic}
 #loader.done{opacity:0;visibility:hidden}.loader-inner{text-align:center}.loader-mark{width:44px;height:44px;border:1px solid #ffffff24;border-top-color:#f1d19a;border-radius:50%;margin:0 auto 20px;animation:spin 1.4s linear infinite}.loader-text{font-size:9px;letter-spacing:.35em;color:#bfc4df;text-transform:uppercase}@keyframes spin{to{transform:rotate(360deg)}}
 @media(max-width:600px){.ui{padding:22px}.brand{font-size:8px}.status{font-size:8px}.center{top:46%}.sub{max-width:300px}.bottom{align-items:end}.hint{max-width:130px;font-size:8px}.actions{flex-direction:column}.btn{padding:12px 14px;font-size:8px}.actions .btn:first-child{display:none}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+#memory-orbit{position:fixed;inset:0;z-index:4;pointer-events:none;display:block}
+.memory-photo{position:absolute;left:50%;top:50%;width:clamp(68px,11vw,116px);height:clamp(88px,14vw,148px);padding:5px;border:1px solid #f1d19a88;border-radius:5px;background:linear-gradient(145deg,#202944,#080d1d);box-shadow:0 8px 32px #0009,0 0 20px #b6c8ff22;transform:translate(-50%,-50%) rotate(var(--a)) translateY(clamp(-340px,-39vh,-205px)) rotate(calc(var(--a)*-1));pointer-events:auto;cursor:pointer;animation:photoFloat 5s ease-in-out infinite;animation-delay:calc(var(--a)/-45*-.35s)}
+.memory-photo:nth-child(even){animation-delay:-2.4s}
+.memory-photo img{width:100%;height:100%;object-fit:cover;border-radius:2px;display:block;filter:saturate(.82) contrast(1.04)}
+.memory-photo span{position:absolute;right:-6px;top:-8px;color:#f5d49a;text-shadow:0 0 12px #f5d49a;font-size:13px}
+@keyframes photoFloat{0%,100%{margin-top:0}50%{margin-top:-9px}}
+#photo-viewer{position:fixed;inset:0;z-index:12;background:#030511ed;backdrop-filter:blur(18px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;opacity:0;visibility:hidden;transition:.35s}
+#photo-viewer.open{opacity:1;visibility:visible}
+#photo-large{max-width:min(82vw,520px);max-height:76vh;object-fit:contain;border:1px solid #f5d49a88;box-shadow:0 15px 70px #000}
+#photo-viewer p{font-size:9px;letter-spacing:.32em;color:#e8d09f;margin-top:18px}
+#photo-close{position:absolute;right:22px;top:18px;border:1px solid #ffffff55;background:#11182b;color:white;border-radius:50%;width:42px;height:42px;font-size:28px;cursor:pointer}
+@media(max-width:600px){.memory-photo{width:clamp(55px,16vw,78px);height:clamp(72px,21vw,102px);transform:translate(-50%,-50%) rotate(var(--a)) translateY(clamp(-285px,-34vh,-175px)) rotate(calc(var(--a)*-1));padding:3px}#memory-orbit{pointer-events:none}.memory-photo{pointer-events:auto}}
+
 </style>
 </head>
 <body>
-<div id="stage"></div><div class="vignette"></div><div class="grain"></div>
+<div id="stage"></div>
+<div id="memory-orbit" aria-label="Maxliyoning suratlari">
+ <button class="memory-photo" type="button" data-photo="1" aria-label="1-suratni kattalashtirish" style="--a:0deg"><img src="assets/photo-1.jpg" alt="Maxliyoning xotirasi 1" loading="lazy"><span>✦</span></button>
+ <button class="memory-photo" type="button" data-photo="2" aria-label="2-suratni kattalashtirish" style="--a:45deg"><img src="assets/photo-2.jpg" alt="Maxliyoning xotirasi 2" loading="lazy"><span>✦</span></button>
+ <button class="memory-photo" type="button" data-photo="3" aria-label="3-suratni kattalashtirish" style="--a:90deg"><img src="assets/photo-3.jpg" alt="Maxliyoning xotirasi 3" loading="lazy"><span>✦</span></button>
+ <button class="memory-photo" type="button" data-photo="4" aria-label="4-suratni kattalashtirish" style="--a:135deg"><img src="assets/photo-4.jpg" alt="Maxliyoning xotirasi 4" loading="lazy"><span>✦</span></button>
+ <button class="memory-photo" type="button" data-photo="5" aria-label="5-suratni kattalashtirish" style="--a:180deg"><img src="assets/photo-5.jpg" alt="Maxliyoning xotirasi 5" loading="lazy"><span>✦</span></button>
+ <button class="memory-photo" type="button" data-photo="6" aria-label="6-suratni kattalashtirish" style="--a:225deg"><img src="assets/photo-6.jpg" alt="Maxliyoning xotirasi 6" loading="lazy"><span>✦</span></button>
+ <button class="memory-photo" type="button" data-photo="7" aria-label="7-suratni kattalashtirish" style="--a:270deg"><img src="assets/photo-7.jpg" alt="Maxliyoning xotirasi 7" loading="lazy"><span>✦</span></button>
+ <button class="memory-photo" type="button" data-photo="8" aria-label="8-suratni kattalashtirish" style="--a:315deg"><img src="assets/photo-8.jpg" alt="Maxliyoning xotirasi 8" loading="lazy"><span>✦</span></button>
+</div>
+<div id="photo-viewer" role="dialog" aria-modal="true" aria-label="Suratni ko‘rish"><button id="photo-close" aria-label="Yopish">×</button><img id="photo-large" alt="Maxliyo surati"><p>MAXLIYONING XOTIRASI</p></div>
+<div class="vignette"></div><div class="grain"></div>
 <div id="loader"><div class="loader-inner"><div class="loader-mark"></div><div class="loader-text">Koinot tayyorlanmoqda</div></div></div>
 <div class="ui" id="interface" aria-hidden="true"></div>
 
@@ -66,6 +92,18 @@ const CONFIG = {
 };
 document.querySelector('#signature').textContent = CONFIG.sender;\ndocument.querySelector('.reveal-title').innerHTML = 'Maxliyo, tug‘ilgan kuning<br><em>muborak!</em>';\ndocument.querySelector('.reveal-kicker').textContent = '✦  SENGA ATALGAN KICHIK KOINOT  ✦';
 document.querySelector('#message').textContent = CONFIG.message;
+
+
+document.querySelectorAll('.memory-photo').forEach(button=>{
+ button.addEventListener('click',()=>{
+  const src=button.querySelector('img').getAttribute('src');
+  document.querySelector('#photo-large').src=src;
+  document.querySelector('#photo-viewer').classList.add('open');
+ });
+});
+function closePhoto(){document.querySelector('#photo-viewer').classList.remove('open');}
+document.querySelector('#photo-close').addEventListener('click',closePhoto);
+document.querySelector('#photo-viewer').addEventListener('click',e=>{if(e.target.id==='photo-viewer')closePhoto();});
 
 const host=document.querySelector('#stage');
 const scene=new THREE.Scene(); scene.background=new THREE.Color(0x050713); scene.fog=new THREE.FogExp2(0x050713,.012);
