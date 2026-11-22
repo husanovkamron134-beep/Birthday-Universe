@@ -176,11 +176,16 @@ renderer.domElement.addEventListener('pointerup',e=>{
  pointer.x=((e.clientX-rect.left)/rect.width)*2-1;
  pointer.y=-((e.clientY-rect.top)/rect.height)*2+1;
  raycaster.setFromCamera(pointer,camera);
- const photoHit=raycaster.intersectObjects(photoPlanets.map(p=>p.sphere),false)[0];
+ // Raycast complete orbit groups recursively, including transformed child planets.
+ const photoHits=raycaster.intersectObjects(photoPlanets.map(p=>p.pivot),true);
+ const photoHit=photoHits.find(hit=>Number.isInteger(hit.object.userData.photoIndex));
  if(photoHit){
   const index=photoHit.object.userData.photoIndex;
-  document.querySelector('#photo-large').src='assets/photo-'+index+'.jpg';
-  document.querySelector('#photo-viewer').classList.add('open');
+  const viewer=document.querySelector('#photo-viewer');
+  const image=document.querySelector('#photo-large');
+  image.onerror=()=>{image.onerror=null;image.src='./assets/photo-'+index+'.jpg';};
+  image.src=new URL('./assets/photo-'+index+'.jpg',document.baseURI).href;
+  viewer.classList.add('open');
   return;
  }
  if(raycaster.intersectObject(planet,true).length)document.querySelector('#reveal').classList.add('show');
@@ -190,7 +195,7 @@ renderer.domElement.addEventListener('pointermove',e=>{
  pointer.x=((e.clientX-rect.left)/rect.width)*2-1;
  pointer.y=-((e.clientY-rect.top)/rect.height)*2+1;
  raycaster.setFromCamera(pointer,camera);
- renderer.domElement.style.cursor=(raycaster.intersectObject(planet,true).length||raycaster.intersectObjects(photoPlanets.map(p=>p.sphere),false).length)?'pointer':'grab';
+ renderer.domElement.style.cursor=(raycaster.intersectObject(planet,true).length||raycaster.intersectObjects(photoPlanets.map(p=>p.pivot),true).some(hit=>Number.isInteger(hit.object.userData.photoIndex)))?'pointer':'grab';
 });
 document.querySelector('#close').addEventListener('click',()=>document.querySelector('#reveal').classList.remove('show'));
 addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);});
