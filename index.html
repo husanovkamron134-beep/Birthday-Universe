@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#050713">
+<title>Birthday Universe — A universe made for you</title>
+<style>
+:root{--ink:#f5f4ff;--muted:#a8acc7;--gold:#f5d49a;--cyan:#8ee8ff;--bg:#050713}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+#stage{position:fixed;inset:0}canvas{display:block}
+.vignette{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 48%,transparent 28%,rgba(2,4,15,.24) 65%,rgba(2,3,10,.88) 100%);z-index:2}
+.grain{position:fixed;inset:-50%;z-index:3;pointer-events:none;opacity:.055;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");animation:grain .3s steps(2) infinite}
+@keyframes grain{0%{transform:translate(0,0)}25%{transform:translate(2%,-1%)}50%{transform:translate(-1%,2%)}75%{transform:translate(1%,1%)}100%{transform:translate(-2%,-1%)}}
+.ui{position:fixed;inset:0;z-index:5;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(22px,4vw,54px);pointer-events:none}
+.top{display:flex;justify-content:space-between;align-items:center;gap:16px}.brand{font-size:10px;letter-spacing:.34em;text-transform:uppercase;color:#c5c8df}.status{font-size:10px;letter-spacing:.2em;color:#9fa7c7;display:flex;align-items:center;gap:9px}.dot{width:6px;height:6px;border-radius:50%;background:#9de8f5;box-shadow:0 0 14px #8ee8ff}
+.center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(780px,90vw);text-align:center;pointer-events:none;transition:opacity 1s,transform 1.2s}
+.eyebrow{font-size:10px;letter-spacing:.42em;text-transform:uppercase;color:var(--gold);margin-bottom:22px;text-shadow:0 0 20px #e6c68b55}
+h1{font-family:Georgia,"Times New Roman",serif;font-weight:400;font-size:clamp(42px,8.5vw,104px);line-height:.98;letter-spacing:-.045em;margin:0;text-shadow:0 8px 50px #000}
+h1 span{display:block;color:#f4d9a8;font-style:italic}
+.sub{font-size:clamp(12px,1.5vw,15px);line-height:1.8;letter-spacing:.08em;color:#c0c5dc;margin:24px auto 0;max-width:440px}
+.bottom{display:flex;justify-content:space-between;align-items:end;gap:20px}.hint{font-size:10px;line-height:1.8;letter-spacing:.18em;text-transform:uppercase;color:#a5abc7}.hint b{color:#f0d39e;font-weight:500}
+.actions{display:flex;gap:10px;pointer-events:auto}.btn{border:1px solid #ffffff35;background:#080d20a8;color:#f4f2ed;padding:13px 20px;border-radius:2px;letter-spacing:.16em;text-transform:uppercase;font-size:9px;cursor:pointer;backdrop-filter:blur(12px);transition:.3s}.btn:hover{border-color:#f2d5a0;background:#f2d5a015;transform:translateY(-2px)}.btn.primary{background:linear-gradient(110deg,#e6c58c,#fff0c8);border-color:transparent;color:#141321;font-weight:700}
+#intro.hidden{opacity:0;transform:translate(-50%,-46%);pointer-events:none}
+#reveal{position:fixed;inset:0;z-index:8;display:grid;place-items:center;background:radial-gradient(ellipse at center,#15142c 0%,#050713 70%);opacity:0;visibility:hidden;transition:opacity 1.4s,visibility 1.4s;padding:28px;text-align:center}
+#reveal.show{opacity:1;visibility:visible}
+.reveal-card{max-width:700px;transform:translateY(22px);transition:transform 1.2s .25s}.show .reveal-card{transform:translateY(0)}
+.reveal-kicker{font-size:10px;letter-spacing:.42em;color:var(--gold);text-transform:uppercase;margin-bottom:24px}
+.reveal-title{font:400 clamp(42px,8vw,88px)/1.03 Georgia,serif;margin:0 0 24px}.reveal-title em{color:var(--gold)}
+.reveal-message{color:#c6c9dc;font-size:clamp(14px,2vw,17px);line-height:1.9;white-space:pre-line}
+.reveal-sign{margin-top:34px;color:#f0d39e;font:italic 22px Georgia,serif}
+.close{margin-top:38px}
+#loader{position:fixed;inset:0;z-index:20;display:grid;place-items:center;background:#050713;transition:opacity .8s,visibility .8s}
+#loader.done{opacity:0;visibility:hidden}.loader-inner{text-align:center}.loader-mark{width:44px;height:44px;border:1px solid #ffffff24;border-top-color:#f1d19a;border-radius:50%;margin:0 auto 20px;animation:spin 1.4s linear infinite}.loader-text{font-size:9px;letter-spacing:.35em;color:#bfc4df;text-transform:uppercase}@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:600px){.ui{padding:22px}.brand{font-size:8px}.status{font-size:8px}.center{top:46%}.sub{max-width:300px}.bottom{align-items:end}.hint{max-width:130px;font-size:8px}.actions{flex-direction:column}.btn{padding:12px 14px;font-size:8px}.actions .btn:first-child{display:none}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<div id="stage"></div><div class="vignette"></div><div class="grain"></div>
+<div id="loader"><div class="loader-inner"><div class="loader-mark"></div><div class="loader-text">Tayyorlanmoqda · your universe awaits</div></div></div>
+<div class="ui" id="interface">
+ <div class="top"><div class="brand">✦ &nbsp; A PERSONAL COSMOS</div><div class="status"><i class="dot"></i> ONE UNIVERSE · ONE MOMENT</div></div>
+ <div class="center" id="intro"><div class="eyebrow">A little universe, just for you</div><h1>Some stars are <span>meant to shine.</span></h1><p class="sub">Bugun osmon odatdagidan boshqacha. Chunki bu galaktikada bitta alohida inson uchun yaratilgan kichik sir bor.</p></div>
+ <div class="bottom"><div class="hint">MOVE TO EXPLORE<br><b>DRAG · ZOOM · DISCOVER</b></div><div class="actions"><button class="btn" id="reset">Recenter view</button><button class="btn primary" id="open">Open your universe&nbsp; ✦</button></div></div>
+</div>
+<div id="reveal"><div class="reveal-card"><div class="reveal-kicker">✦ &nbsp; a message from the stars &nbsp; ✦</div><h2 class="reveal-title">Happy Birthday,<br><em id="recipient">dear friend</em></h2><p class="reveal-message" id="message">Yangi yoshing quvonchli lahzalar, katta orzular va unutilmas xotiralarga boy bo‘lsin.
+Har doim o‘z nuring bilan porla — bu koinotda sening o‘rning alohida.</p><div class="reveal-sign" id="signature">With warm wishes</div><button class="btn close" id="close">Return to the stars</button></div></div>
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js';
+
+// Personalize these four values before sharing the surprise.
+const CONFIG = {
+  recipient: 'dear friend',
+  sender: 'With warm wishes',
+  message: 'Yangi yoshing quvonchli lahzalar, katta orzular va unutilmas xotiralarga boy bo‘lsin.\nHar doim o‘z nuring bilan porla — bu koinotda sening o‘rning alohida.',
+  revealTitle: 'A message from the stars'
+};
+document.querySelector('#recipient').textContent = CONFIG.recipient;
+document.querySelector('#signature').textContent = CONFIG.sender;
+document.querySelector('#message').textContent = CONFIG.message;
+
+const host=document.querySelector('#stage');
+const scene=new THREE.Scene(); scene.background=new THREE.Color(0x050713); scene.fog=new THREE.FogExp2(0x050713,.012);
+const camera=new THREE.PerspectiveCamera(48,innerWidth/innerHeight,.1,900);camera.position.set(0,5.5,19);
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.22;host.appendChild(renderer.domElement);
+const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.dampingFactor=.045;controls.minDistance=8;controls.maxDistance=36;controls.enablePan=false;controls.maxPolarAngle=Math.PI*.82;controls.target.set(0,0,0);
+
+// Lighting: a warm key light and cool atmospheric fill.
+scene.add(new THREE.AmbientLight(0x7184bd,.42));
+const key=new THREE.PointLight(0xffd7a0,170,90,2);key.position.set(-7,8,9);scene.add(key);
+const rim=new THREE.PointLight(0x477bff,120,80,2);rim.position.set(8,-3,-7);scene.add(rim);
+
+// Procedural star field with varied brightness and depth.
+function starField(count,radius,size,opacity=1){
+ const p=new Float32Array(count*3), c=new Float32Array(count*3), s=new Float32Array(count);
+ for(let i=0;i<count;i++){const u=Math.random()*2-1,a=Math.random()*Math.PI*2,r=radius*(.45+Math.random()*.55),q=Math.sqrt(1-u*u);p[i*3]=r*q*Math.cos(a);p[i*3+1]=r*u;p[i*3+2]=r*q*Math.sin(a);const warm=Math.random();const col=new THREE.Color().setHSL(warm>.82?.11:.58,.25+Math.random()*.35,.68+Math.random()*.3);c.set(col.toArray(),i*3);s[i]=.5+Math.random()*1.5;}
+ const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(p,3));g.setAttribute('color',new THREE.BufferAttribute(c,3));g.setAttribute('aScale',new THREE.BufferAttribute(s,1));
+ const m=new THREE.PointsMaterial({size,sizeAttenuation:true,vertexColors:true,transparent:true,opacity,depthWrite:false,blending:THREE.AdditiveBlending});
+ const pts=new THREE.Points(g,m);scene.add(pts);return pts;
+}
+const starsFar=starField(5200,170,.22,.82),starsNear=starField(1100,95,.42,.9);
+
+// Nebula clouds: layered transparent, softly blurred procedural sprites.
+function nebulaTexture(){
+ const canvas=document.createElement('canvas');canvas.width=512;canvas.height=512;const ctx=canvas.getContext('2d');
+ const grad=ctx.createRadialGradient(256,256,8,256,256,245);grad.addColorStop(0,'rgba(150,105,255,.48)');grad.addColorStop(.25,'rgba(68,95,205,.24)');grad.addColorStop(.58,'rgba(35,75,145,.09)');grad.addColorStop(1,'rgba(0,0,0,0)');
+ ctx.fillStyle=grad;ctx.fillRect(0,0,512,512);
+ for(let i=0;i<90;i++){const x=Math.random()*512,y=Math.random()*512,r=10+Math.random()*65;const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,'rgba(120,135,255,.09)');g.addColorStop(1,'rgba(80,100,255,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();}
+ return new THREE.CanvasTexture(canvas);
+}
+const nebulaTex=nebulaTexture();
+for(let i=0;i<8;i++){const mat=new THREE.SpriteMaterial({map:nebulaTex,color:new THREE.Color().setHSL(.60+i*.018,.65,.48),transparent:true,opacity:.28+Math.random()*.12,depthWrite:false,blending:THREE.AdditiveBlending});const sp=new THREE.Sprite(mat);sp.position.set((Math.random()-.5)*46,(Math.random()-.5)*25,-18-Math.random()*30);const scale=16+Math.random()*22;sp.scale.set(scale,scale*.66,1);scene.add(sp);}
+
+// Central planet: physical material, procedural surface, atmosphere and rings.
+const planetGroup=new THREE.Group();scene.add(planetGroup);
+const planetGeo=new THREE.SphereGeometry(3.35,128,96);
+const surfaceCanvas=document.createElement('canvas');surfaceCanvas.width=1024;surfaceCanvas.height=512;const cx=surfaceCanvas.getContext('2d');
+const base=cx.createLinearGradient(0,0,1024,512);base.addColorStop(0,'#17254d');base.addColorStop(.35,'#385d91');base.addColorStop(.7,'#172344');base.addColorStop(1,'#6c4567');cx.fillStyle=base;cx.fillRect(0,0,1024,512);
+for(let i=0;i<240;i++){const x=Math.random()*1024,y=Math.random()*512,w=15+Math.random()*150,h=3+Math.random()*28;cx.fillStyle=['rgba(150,183,220,.10)','rgba(7,17,44,.18)','rgba(232,179,151,.08)'][i%3];cx.beginPath();cx.ellipse(x,y,w,h,Math.random()*.5,0,Math.PI*2);cx.fill();}
+const surfaceTex=new THREE.CanvasTexture(surfaceCanvas);surfaceTex.colorSpace=THREE.SRGBColorSpace;
+const planet=new THREE.Mesh(planetGeo,new THREE.MeshStandardMaterial({map:surfaceTex,roughness:.82,metalness:.08}));planetGroup.add(planet);
+const atmosphere=new THREE.Mesh(new THREE.SphereGeometry(3.48,96,72),new THREE.MeshBasicMaterial({color:0x77baff,transparent:true,opacity:.12,side:THREE.BackSide,blending:THREE.AdditiveBlending}));planetGroup.add(atmosphere);
+const halo=new THREE.Mesh(new THREE.SphereGeometry(3.72,96,72),new THREE.MeshBasicMaterial({color:0x547dff,transparent:true,opacity:.055,side:THREE.BackSide,blending:THREE.AdditiveBlending}));planetGroup.add(halo);
+const ring=new THREE.Mesh(new THREE.RingGeometry(4.35,6.15,160),new THREE.MeshBasicMaterial({color:0xc8a8e9,transparent:true,opacity:.35,side:THREE.DoubleSide,depthWrite:false}));ring.rotation.set(1.18,.18,.22);planetGroup.add(ring);
+const ring2=new THREE.Mesh(new THREE.RingGeometry(6.25,6.42,160),new THREE.MeshBasicMaterial({color:0x8ac9ff,transparent:true,opacity:.16,side:THREE.DoubleSide,depthWrite:false}));ring2.rotation.copy(ring.rotation);planetGroup.add(ring2);
+
+// Fine orbit lines and three small moons.
+const orbitMat=new THREE.LineBasicMaterial({color:0x8bb9ff,transparent:true,opacity:.22});
+for(const r of [8.2,10.8,13.7]){const pts=[];for(let i=0;i<=240;i++){const a=i/240*Math.PI*2;pts.push(new THREE.Vector3(Math.cos(a)*r,Math.sin(a)*r*.24,Math.sin(a)*r*.72));}const line=new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),orbitMat);scene.add(line);}
+const moons=[];
+for(let i=0;i<3;i++){const pivot=new THREE.Group();scene.add(pivot);const r=8.2+i*2.7;pivot.rotation.z=i*2.1;pivot.rotation.x=.15+i*.17;const moon=new THREE.Mesh(new THREE.SphereGeometry(i===1?.42:.27,32,24),new THREE.MeshStandardMaterial({color:[0xb9c5e9,0xe4c9a4,0x8fa8d8][i],roughness:.72,metalness:.18,emissive:[0x17274a,0x3b2415,0x14233d][i],emissiveIntensity:.28}));moon.position.set(r,0,0);pivot.add(moon);moons.push(pivot);}
+
+// A trail of tiny luminous particles around the main body.
+const dustCount=2600,dustPos=new Float32Array(dustCount*3);for(let i=0;i<dustCount;i++){const a=Math.random()*Math.PI*2,r=4.3+Math.random()*3.4;dustPos[i*3]=Math.cos(a)*r;dustPos[i*3+1]=(Math.random()-.5)*.42;dustPos[i*3+2]=Math.sin(a)*r;}
+const dustGeo=new THREE.BufferGeometry();dustGeo.setAttribute('position',new THREE.BufferAttribute(dustPos,3));const dust=new THREE.Points(dustGeo,new THREE.PointsMaterial({color:0xf0d8ad,size:.035,transparent:true,opacity:.7,depthWrite:false}));planetGroup.add(dust);
+
+// Subtle floating sparkles in foreground.
+const sparkle=starField(500,24,.08,.75);
+
+const clock=new THREE.Clock();let revealMode=false;
+function animate(){requestAnimationFrame(animate);const t=clock.getElapsedTime();planet.rotation.y=t*.035;planetGroup.rotation.y=Math.sin(t*.08)*.08;ring.rotation.z+=.00045;dust.rotation.y=-t*.012;starsFar.rotation.y=t*.0018;starsNear.rotation.y=-t*.003;sparkle.rotation.y=t*.004;moons.forEach((m,i)=>m.rotation.y=t*(.055+i*.018));controls.update();renderer.render(scene,camera);}
+animate();
+const loader=document.querySelector('#loader');setTimeout(()=>loader.classList.add('done'),650);
+document.querySelector('#reset').addEventListener('click',()=>{controls.target.set(0,0,0);camera.position.set(0,5.5,19);controls.update();});
+document.querySelector('#open').addEventListener('click',()=>{document.querySelector('#intro').classList.add('hidden');document.querySelector('#reveal').classList.add('show');});
+document.querySelector('#close').addEventListener('click',()=>{document.querySelector('#reveal').classList.remove('show');document.querySelector('#intro').classList.remove('hidden');});
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);});
+</script>
+</body>
+</html>
